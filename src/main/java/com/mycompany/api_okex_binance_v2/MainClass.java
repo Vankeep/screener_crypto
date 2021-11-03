@@ -1,13 +1,15 @@
 package com.mycompany.api_okex_binance_v2;
 
-import com.mycompany.api_okex_binance_v2.objeckt.CoinBigData;
+import com.mycompany.api_okex_binance_v2.database.CoinBigData;
 import com.mycompany.api_okex_binance_v2.constants.ConstCoin;
 import com.mycompany.api_okex_binance_v2.constants.ConstExchange;
 import com.mycompany.api_okex_binance_v2.constants.ConstTF;
 import com.mycompany.api_okex_binance_v2.database.GenerateSqlMessage;
+import com.mycompany.api_okex_binance_v2.net.Connect;
 import com.mycompany.api_okex_binance_v2.net.GenerateUrlMessage;
+import java.util.Arrays;
 
-public class MainClass {
+public class MainClass {   
     
     public String[] open;
     public String[] time;
@@ -16,7 +18,7 @@ public class MainClass {
     public String[] close;
     public String[] volume;
     CoinBigData name;
-
+    
     public static void main(String[] args) {
         MainClass mainClass = new MainClass();
         mainClass.momo();
@@ -34,6 +36,8 @@ public class MainClass {
         
         CoinBigData dodo = new CoinBigData("DODO", time, open, high, low, close, volume, ConstCoin.BTC);
         CoinBigData slp = new CoinBigData("SLP", time, open, high, low, close, volume, ConstCoin.BTC);
+        
+        System.out.println(Arrays.toString(dodo.getClose()));
        
         GenerateUrlMessage gumOK = new GenerateUrlMessage(ConstExchange.EX_OKEX);
         GenerateUrlMessage gumBN = new GenerateUrlMessage(ConstExchange.EX_BINANCE);
@@ -41,6 +45,11 @@ public class MainClass {
         System.out.println(gumOK.getCoinData("BTC", ConstCoin.USDT, ConstTF.HOUR_ONE));
         System.out.println(gumBN.getCoinData("BTC", ConstCoin.USDT, ConstTF.HOUR_ONE));
         
+        Connect driverOkex = new Connect(ConstExchange.EX_OKEX);
+        Connect driverBinance = new Connect(ConstExchange.EX_BINANCE);
+
+//        driverBinance.getAllExInfo();
+//        driverOkex.getAllExInfo();
         
         
     }

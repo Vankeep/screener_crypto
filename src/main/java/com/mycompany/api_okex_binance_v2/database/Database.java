@@ -1,6 +1,5 @@
 package com.mycompany.api_okex_binance_v2.database;
 
-import com.mycompany.api_okex_binance_v2.objeckt.CoinBigData;
 import com.mycompany.api_okex_binance_v2.constants.ConstCoin;
 import com.mycompany.api_okex_binance_v2.constants.ConstExchange;
 import java.sql.*;

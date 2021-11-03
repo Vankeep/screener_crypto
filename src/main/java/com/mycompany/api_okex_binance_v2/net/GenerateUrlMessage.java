@@ -37,7 +37,7 @@ public class GenerateUrlMessage {
      * @return строка
      */
     public String getCoinData(String coin, ConstCoin qCoin, ConstTF tF) {
-        String timeFrame = tfDriver(tF);
+        String timeFrame = Driver.tfDriver(tF, ex);
         switch (ex) {
             case EX_OKEX:
                 return ex.getUrl() + "api/spot/v3/instruments/" + coin + "-" + qCoin.name()
@@ -51,31 +51,5 @@ public class GenerateUrlMessage {
                 return null;
         }
     }
-    
-    
-    /**
-     * Вспомогательный метод для конверирования пришедшего таймфрейма в строку
-     * понятную для выбранной биржи
-     *
-     * @param tf таймфрейм
-     * @return строка
-     */
-    private String tfDriver(ConstTF tf) {
-        switch (tf) {
-            case HOUR_ONE:
-                return ex.getHOUR_ONE();
-            case HOUR_TWO:
-                return ex.getHOUR_TWO();
-            case HOUR_FOUR:
-                return ex.getHOUR_FOUR();
-            case HOUR_SIX:
-                return ex.getHOUR_SIX();
-            case HOUR_TWENTY:
-                return ex.getHOUR_TWENTY();
-            case DAY_ONE:
-                return ex.getDAY_ONE();
-            default:
-                return null;
-        }
-    }
+
 }
