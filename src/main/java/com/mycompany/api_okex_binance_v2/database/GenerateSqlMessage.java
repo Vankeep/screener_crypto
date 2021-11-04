@@ -1,5 +1,7 @@
 package com.mycompany.api_okex_binance_v2.database;
 
+import com.mycompany.api_okex_binance_v2.constants.Const;
+
 public class GenerateSqlMessage {
 
     /**
@@ -124,8 +126,8 @@ public class GenerateSqlMessage {
      * @param qCoin монета котировки
      * @return SELECT nameCoin FROM qCoin
      */
-    public String readQcoin(String qCoin) {
-        return "SELECT nameCoin FROM " + qCoin;
+    public String readQcoin(Const.Coin qCoin) {
+        return "SELECT id, nameCoin FROM " + qCoin;
     }
 
 }

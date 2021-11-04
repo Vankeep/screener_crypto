@@ -1,10 +1,12 @@
 package com.mycompany.api_okex_binance_v2;
 
+
 import com.mycompany.api_okex_binance_v2.constants.Const;
+import java.util.HashMap;
 
 public interface DatabaseClient {
 
-    public abstract String[] getAllPair(Const.Coin qCoin);
+    public abstract HashMap<Integer,String> getAllPair(Const.Coin qCoin);
 
     public abstract long[] getDataCoin(Const.TF tf, String bCoin, Const.Coin qCoin, Const.OHLC ohlc);
 

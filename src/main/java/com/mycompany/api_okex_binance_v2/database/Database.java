@@ -4,8 +4,9 @@ import com.mycompany.api_okex_binance_v2.DatabaseClient;
 import com.mycompany.api_okex_binance_v2.constants.Const;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
-public class Database implements DatabaseClient{
+public class Database implements DatabaseClient {
 
     GenerateSqlMessage sqlMessage = new GenerateSqlMessage();
     Connection connection;
@@ -29,7 +30,7 @@ public class Database implements DatabaseClient{
      *
      * @return true - успех, false - неудачное подключение
      */
-    private boolean connect()  {
+    private boolean connect() {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("JDBC:sqlite:" + exchange.getName() + ".db");
@@ -40,7 +41,7 @@ public class Database implements DatabaseClient{
             return false;
         }
     }
-    
+
     private void write(String message) {
         try {
             statement = connection.createStatement();
@@ -51,19 +52,22 @@ public class Database implements DatabaseClient{
 
     }
 
-    private void read(String message) {
+    private HashMap<Integer,String> readQcoin(String message) {
+        HashMap<Integer,String> map = new HashMap<>();
         try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(message);
 
             while (rs.next()) {
-                double a = rs.getDouble("BTC");
-                System.out.println(a);
+                int key = rs.getInt("id");
+                String nameCoin = rs.getString("nameCoin");
+                map.put(key, nameCoin);
             }
 
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
+        return map;
     }
 
     private void close() {
@@ -74,11 +78,11 @@ public class Database implements DatabaseClient{
             System.out.println(ex.getMessage());
         }
     }
-    
+
     public boolean insertAllPairToDatabase(ArrayList<ArrayList<String>> list) {
-        if(connect()){
+        if (connect()) {
             for (ArrayList<String> arrayList : list) {
-                System.out.println("Запись пар к "+arrayList.get(0)+"...");
+                System.out.println("Запись пар к " + arrayList.get(0) + "...");
                 write(sqlMessage.deleteTable(arrayList.get(0)));
                 write(sqlMessage.createTable(arrayList.get(0)));
                 for (int i = 1; i < arrayList.size(); i++) {
@@ -90,13 +94,17 @@ public class Database implements DatabaseClient{
         } else {
             return false;
         }
-        
-        
+
     }
-    
+
     @Override
-    public String[] getAllPair(Const.Coin qCoin) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public HashMap<Integer,String> getAllPair(Const.Coin qCoin) {
+        if(connect()){
+            HashMap<Integer,String> map = readQcoin(sqlMessage.readQcoin(qCoin));
+            close();
+            return map;
+        }
+        return null;
     }
 
     @Override
@@ -119,5 +127,4 @@ public class Database implements DatabaseClient{
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
-  
 }
