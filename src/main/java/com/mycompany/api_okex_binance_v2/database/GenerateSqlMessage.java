@@ -102,7 +102,7 @@ public class GenerateSqlMessage {
      * Добавление в таблицу со списом всех пар
      *
      * @param nameTable имя таблицы
-     * @param bCoin монета для втавки
+     * @param bCoin base coin
      * @return INSERT INTO nameTable ( nameCoin ) VALUES ( 'bCoin' )
      */
     public String insertQcoin(String nameTable, String bCoin) {
@@ -112,8 +112,8 @@ public class GenerateSqlMessage {
     /**
      * Получение данных из таблиц с данными
      *
-     * @param bCoin базовая монета
-     * @param qCoin монета котировки
+     * @param bCoin base coin
+     * @param qCoin quote coin
      * @return SELECT time, open, high, low, close, volume FROM bCoin_qCoin
      */
     public String readBcoin(String bCoin, String qCoin) {
@@ -123,10 +123,10 @@ public class GenerateSqlMessage {
     /**
      * Получение всей таблицы со списком монет
      *
-     * @param qCoin монета котировки
+     * @param qCoin quote coin
      * @return SELECT nameCoin FROM qCoin
      */
-    public String readQcoin(Const.Coin qCoin) {
+    public String readQcoin(Const.COIN qCoin) {
         return "SELECT id, nameCoin FROM " + qCoin;
     }
 

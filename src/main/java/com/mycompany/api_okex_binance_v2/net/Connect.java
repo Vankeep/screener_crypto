@@ -16,9 +16,9 @@ import com.mycompany.api_okex_binance_v2.HttpClient;
 public class Connect implements HttpClient {
 
     private ArrayList<ArrayList<String>> list;
-    private Const.Exchange ex;
+    private Const.EXCHANGE ex;
 
-    public Connect(Const.Exchange ex) {
+    public Connect(Const.EXCHANGE ex) {
         this.ex = ex;
     }
 
@@ -53,7 +53,11 @@ public class Connect implements HttpClient {
         }
 
     }
-
+    /**
+     * Обнновление всех тикеров в бд. Следана на случай появления новых монет
+     * 
+     * @return если скачивание и запись прошли успешно возвращает true
+     */
     @Override
     public boolean updateAllPair() {
         boolean ok = false;
@@ -65,8 +69,8 @@ public class Connect implements HttpClient {
     }
 
     @Override
-    public boolean updateCoinData(String bCoin, Const.Coin qCoin) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public boolean updateCoinData(String bCoin, Const.COIN qCoin) {
+        return false;
     }
 
 }

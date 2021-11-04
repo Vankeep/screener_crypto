@@ -9,7 +9,7 @@ public interface HttpClient {
     
     public abstract boolean updateAllPair();
     
-    public abstract boolean updateCoinData(String bCoin, Const.Coin qCoin);
+    public abstract boolean updateCoinData(String bCoin, Const.COIN qCoin);
     
     
 }

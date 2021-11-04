@@ -11,9 +11,9 @@ public class Database implements DatabaseClient {
     GenerateSqlMessage sqlMessage = new GenerateSqlMessage();
     Connection connection;
     Statement statement;
-    Const.Exchange exchange;
+    Const.EXCHANGE exchange;
     
-    public Database(Const.Exchange exchange) {
+    public Database(Const.EXCHANGE exchange) {
         this.exchange = exchange;
     }
 
@@ -98,7 +98,7 @@ public class Database implements DatabaseClient {
     }
 
     @Override
-    public HashMap<Integer,String> getAllPair(Const.Coin qCoin) {
+    public HashMap<Integer,String> getAllPair(Const.COIN qCoin) {
         if(connect()){
             HashMap<Integer,String> map = readQcoin(sqlMessage.readQcoin(qCoin));
             close();
@@ -108,22 +108,22 @@ public class Database implements DatabaseClient {
     }
 
     @Override
-    public long[] getDataCoin(Const.TF tf, String bCoin, Const.Coin qCoin, Const.OHLC ohlc) {
+    public long[] getDataCoin(Const.TF tf, String bCoin, Const.COIN qCoin, Const.OHLC ohlc) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public long[][] getDataCoin(Const.TF tf, String bCoin, Const.Coin qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2) {
+    public long[][] getDataCoin(Const.TF tf, String bCoin, Const.COIN qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public long[][] getDataCoin(Const.TF tf, String bCoin, Const.Coin qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2, Const.OHLC ohlc3) {
+    public long[][] getDataCoin(Const.TF tf, String bCoin, Const.COIN qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2, Const.OHLC ohlc3) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public long[][] getDataCoin(Const.TF tf, String bCoin, Const.Coin qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2, Const.OHLC ohlc3, Const.OHLC ohlc4) {
+    public long[][] getDataCoin(Const.TF tf, String bCoin, Const.COIN qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2, Const.OHLC ohlc3, Const.OHLC ohlc4) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

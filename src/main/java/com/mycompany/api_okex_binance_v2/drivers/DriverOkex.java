@@ -26,13 +26,13 @@ public class DriverOkex {
         ArrayList<ArrayList<String>> list = new ArrayList<>();
 
         ArrayList<String> btc = new ArrayList<>();
-        btc.add(Const.Coin.BTC.toString());
+        btc.add(Const.COIN.BTC.toString());
 
         ArrayList<String> eth = new ArrayList<>();
-        eth.add(Const.Coin.ETH.toString());
+        eth.add(Const.COIN.ETH.toString());
 
         ArrayList<String> usdt = new ArrayList<>();
-        usdt.add(Const.Coin.USDT.toString());
+        usdt.add(Const.COIN.USDT.toString());
 
         StringBuilder sb = new StringBuilder();
         FileInputStream fis;
@@ -47,13 +47,13 @@ public class DriverOkex {
             Gson gson = new Gson();
             CoinOKEX[] pair = gson.fromJson(sb.toString(), CoinOKEX[].class);
             for (CoinOKEX cokex : pair) {
-                if (cokex.getQuote_currency().equals(Const.Coin.BTC.toString())) {
+                if (cokex.getQuote_currency().equals(Const.COIN.BTC.toString())) {
                     btc.add(cokex.getBase_currency());
                 }
-                if (cokex.getQuote_currency().equals(Const.Coin.ETH.toString())) {
+                if (cokex.getQuote_currency().equals(Const.COIN.ETH.toString())) {
                     eth.add(cokex.getBase_currency());
                 }
-                if (cokex.getQuote_currency().equals(Const.Coin.USDT.toString())) {
+                if (cokex.getQuote_currency().equals(Const.COIN.USDT.toString())) {
                     usdt.add(cokex.getBase_currency());
                 }
             }

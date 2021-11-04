@@ -10,12 +10,12 @@ public class Const {
         return pachToDbFile;
     }
     
-    public enum Exchange{
+    public enum EXCHANGE{
         EX_OKEX("okex"), EX_BINANCE("binance");
 
         private String name;
 
-        private Exchange(String name) {
+        private EXCHANGE(String name) {
             this.name = name;
         }
 
@@ -24,12 +24,12 @@ public class Const {
         }
     }
     
-    public enum Coin {
+    public enum COIN {
         BTC("BTC"), ETH("ETH"), USDT("USDT");
 
         String name;
 
-        private Coin(String name) {
+        private COIN(String name) {
             this.name = name;
         }
 
@@ -40,7 +40,17 @@ public class Const {
     }
     
     public enum TF{
-        HOUR_ONE, HOUR_TWO, HOUR_FOUR, HOUR_SIX, HOUR_TWENTY, DAY_ONE;
+        //HOUR_ONE, HOUR_TWO, HOUR_FOUR, HOUR_SIX, HOUR_TWENTY, DAY_ONE;
+        HOUR_ONE(3600000), HOUR_TWO(7200000), HOUR_FOUR(14400000), HOUR_SIX(21600000), HOUR_TWENTY(43200000), DAY_ONE(86400000);
+        long msec;
+
+        private TF(long msec) {
+            this.msec = msec;
+        }
+
+        public long getMsec() {
+            return msec;
+        }
     }
     
     public enum OHLC{

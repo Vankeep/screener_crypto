@@ -23,13 +23,13 @@ public class DriverBinance {
         ArrayList<ArrayList<String>> list = new ArrayList<>();
 
         ArrayList<String> btc = new ArrayList<>();
-        btc.add(Const.Coin.BTC.toString());
+        btc.add(Const.COIN.BTC.toString());
 
         ArrayList<String> eth = new ArrayList<>();
-        eth.add(Const.Coin.ETH.toString());
+        eth.add(Const.COIN.ETH.toString());
 
         ArrayList<String> usdt = new ArrayList<>();
-        usdt.add(Const.Coin.USDT.toString());
+        usdt.add(Const.COIN.USDT.toString());
         try {
             FileReader fileReader = new FileReader(fail);
             JsonElement jsonElement = JsonParser.parseReader(fileReader);
@@ -41,13 +41,13 @@ public class DriverBinance {
                 String baseAsset = symbolJsonObj.get("baseAsset").getAsString();
                 String quoteAsset = symbolJsonObj.get("quoteAsset").getAsString();
                 if (status.equals("TRADING")) {
-                    if (quoteAsset.equals(Const.Coin.BTC.toString())) {
+                    if (quoteAsset.equals(Const.COIN.BTC.toString())) {
                         btc.add(baseAsset);
                     }
-                    if (quoteAsset.equals(Const.Coin.ETH.toString())) {
+                    if (quoteAsset.equals(Const.COIN.ETH.toString())) {
                         eth.add(baseAsset);
                     }
-                    if (quoteAsset.equals(Const.Coin.USDT.toString())) {
+                    if (quoteAsset.equals(Const.COIN.USDT.toString())) {
                         usdt.add(baseAsset);
                     }
                 }
