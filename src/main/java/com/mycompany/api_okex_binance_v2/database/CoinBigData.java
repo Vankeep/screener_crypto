@@ -1,6 +1,6 @@
 package com.mycompany.api_okex_binance_v2.database;
 
-import com.mycompany.api_okex_binance_v2.constants.ConstCoin; 
+import com.mycompany.api_okex_binance_v2.constants.Const; 
 
 public class CoinBigData {
     
@@ -11,9 +11,9 @@ public class CoinBigData {
     private String[] low;
     private String[] close;
     private String[] volume;
-    private ConstCoin qCoin;
+    private Const.Coin qCoin;
 
-    public CoinBigData(String name, String[] time, String[] open, String[] high, String[] low, String[] close, String[] volume, ConstCoin qCoin) {
+    public CoinBigData(String name, String[] time, String[] open, String[] high, String[] low, String[] close, String[] volume, Const.Coin qCoin) {
         this.name = name;
         this.time = time;
         this.open = open;
@@ -76,7 +76,7 @@ public class CoinBigData {
         return name;
     }
 
-    public ConstCoin getqCoin() {
+    public Const.Coin getqCoin() {
         return qCoin;
     }
     

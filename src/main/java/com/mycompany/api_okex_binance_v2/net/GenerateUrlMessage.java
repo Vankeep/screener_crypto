@@ -1,16 +1,14 @@
 package com.mycompany.api_okex_binance_v2.net;
 
-import com.mycompany.api_okex_binance_v2.constants.ConstCoin;
-import com.mycompany.api_okex_binance_v2.constants.ConstExchange;
-import com.mycompany.api_okex_binance_v2.constants.ConstTF;
+import com.mycompany.api_okex_binance_v2.constants.Const;
 import com.mycompany.api_okex_binance_v2.drivers.DriverBinance;
 import com.mycompany.api_okex_binance_v2.drivers.DriverOkex;
 
 public class GenerateUrlMessage {
 
-    private ConstExchange ex;
+    private Const.Exchange ex;
 
-    public GenerateUrlMessage(ConstExchange ex) {
+    public GenerateUrlMessage(Const.Exchange ex) {
         this.ex = ex;
     }
 
@@ -38,7 +36,7 @@ public class GenerateUrlMessage {
      * @param tF таймфрейм
      * @return строка
      */
-    public String getCoinData(String coin, ConstCoin qCoin, ConstTF tF) {
+    public String getCoinData(String coin, Const.Coin qCoin, Const.TF tF) {
         switch (ex) {
             case EX_OKEX:
                 return DriverOkex.getUrl() + "api/spot/v3/instruments/" + coin + "-" + qCoin.name()

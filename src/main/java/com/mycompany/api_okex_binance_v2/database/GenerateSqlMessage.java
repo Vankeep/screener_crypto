@@ -1,6 +1,7 @@
 package com.mycompany.api_okex_binance_v2.database;
 
-import com.mycompany.api_okex_binance_v2.constants.ConstCoin;
+import com.mycompany.api_okex_binance_v2.constants.Const;
+
 
 public class GenerateSqlMessage {
 
@@ -30,7 +31,7 @@ public class GenerateSqlMessage {
      * @param qCoin монета котировки
      * @return строка
      */
-    public String createNewTable(String coin, ConstCoin qCoin) {
+    public String createNewTable(String coin, Const.Coin qCoin) {
 
         String message = "CREATE TABLE " + coin + "_" + qCoin.toString() + " ("
                 + " time LONG,"
@@ -60,7 +61,7 @@ public class GenerateSqlMessage {
      * @param qCoin монета котировки
      * @return строка
      */
-    public String deleteTable(String coin, ConstCoin qCoin) {
+    public String deleteTable(String coin, Const.Coin qCoin) {
         return "DROP TABLE " + coin + "_" + qCoin.toString();
     }
 
@@ -70,7 +71,7 @@ public class GenerateSqlMessage {
      * @param qCoin монета котировки
      * @return строка
      */
-    public String createNewTable(ConstCoin qCoin) {
+    public String createNewTable(Const.Coin qCoin) {
 
         String message = "CREATE TABLE " + qCoin.toString() + " ("
                 + " id INTEGER PRIMARY KEY AUTOINCREMENT,"
@@ -84,7 +85,7 @@ public class GenerateSqlMessage {
      * @param qCoin монета коритовки
      * @return строка
      */
-    public String deleteTable(ConstCoin qCoin) {
+    public String deleteTable(Const.Coin qCoin) {
         return "DROP TABLE " + qCoin.toString();
     }
 
@@ -121,7 +122,7 @@ public class GenerateSqlMessage {
      * @param qCoin монета коритовки
      * @return строка
      */
-    public String insertDataCoin(String name, String time, String open, String high, String low, String close, String volume, ConstCoin qCoin) {
+    public String insertDataCoin(String name, String time, String open, String high, String low, String close, String volume, Const.Coin qCoin) {
         String message = "INSERT INTO " + name + "_" + qCoin.toString() + " ( time, open, high, low, close, volume)"
                 + " VALUES ( '"
                 + time + "', '"
@@ -150,7 +151,7 @@ public class GenerateSqlMessage {
      * @param qCoin монета котировки
      * @return строка
      */
-    public String readDataCoin(String coin, ConstCoin qCoin) {
+    public String readDataCoin(String coin, Const.Coin qCoin) {
         return "SELECT time, open, high, low, close, volume FROM " + coin + "_" + qCoin.toString();
     }
 

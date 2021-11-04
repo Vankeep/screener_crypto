@@ -4,8 +4,7 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mycompany.api_okex_binance_v2.constants.ConstCoin;
-import com.mycompany.api_okex_binance_v2.constants.ConstTF;
+import com.mycompany.api_okex_binance_v2.constants.Const;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -24,13 +23,13 @@ public class DriverBinance {
         ArrayList<ArrayList<String>> list = new ArrayList<>(3);
 
         ArrayList<String> btc = new ArrayList<>();
-        btc.add(ConstCoin.BTC.toString());
+        btc.add(Const.Coin.BTC.toString());
 
         ArrayList<String> eth = new ArrayList<>();
-        eth.add(ConstCoin.ETH.toString());
+        eth.add(Const.Coin.ETH.toString());
 
         ArrayList<String> usdt = new ArrayList<>();
-        usdt.add(ConstCoin.USDT.toString());
+        usdt.add(Const.Coin.USDT.toString());
         try {
             FileReader fileReader = new FileReader(fail);
             JsonElement jsonElement = JsonParser.parseReader(fileReader);
@@ -42,13 +41,13 @@ public class DriverBinance {
                 String baseAsset = symbolJsonObj.get("baseAsset").getAsString();
                 String quoteAsset = symbolJsonObj.get("quoteAsset").getAsString();
                 if (status.equals("TRADING")) {
-                    if (quoteAsset.equals(ConstCoin.BTC.toString())) {
+                    if (quoteAsset.equals(Const.Coin.BTC.toString())) {
                         btc.add(baseAsset);
                     }
-                    if (quoteAsset.equals(ConstCoin.ETH.toString())) {
+                    if (quoteAsset.equals(Const.Coin.ETH.toString())) {
                         eth.add(baseAsset);
                     }
-                    if (quoteAsset.equals(ConstCoin.USDT.toString())) {
+                    if (quoteAsset.equals(Const.Coin.USDT.toString())) {
                         usdt.add(baseAsset);
                     }
                 }
@@ -64,8 +63,8 @@ public class DriverBinance {
         return list;
     }
     
-    public static String getTf(ConstTF constTF){
-        switch (constTF) {
+    public static String getTf(Const.TF tf){
+        switch (tf) {
             case HOUR_ONE:
                 return "1h";
             case HOUR_TWO:

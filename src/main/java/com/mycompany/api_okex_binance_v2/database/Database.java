@@ -1,7 +1,6 @@
 package com.mycompany.api_okex_binance_v2.database;
 
-import com.mycompany.api_okex_binance_v2.constants.ConstCoin;
-import com.mycompany.api_okex_binance_v2.constants.ConstExchange;
+import com.mycompany.api_okex_binance_v2.constants.Const;
 import java.sql.*;
 
 public class Database {
@@ -9,9 +8,9 @@ public class Database {
     GenerateSqlMessage sqlMessage;
     Connection connection;
     Statement statement;
-    ConstExchange exchange;
+    Const.Exchange exchange;
 
-    public Database(ConstExchange exchange) {
+    public Database(Const.Exchange exchange) {
         this.exchange = exchange;
     }
 
@@ -28,7 +27,7 @@ public class Database {
      *
      * @return true - успех, false - неудачное подключение
      */
-    private boolean connect() {
+    private boolean connect()  {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("JDBC:sqlite:" + exchange.getName() + ".db");
@@ -56,7 +55,7 @@ public class Database {
 
     }
 
-    private void write(String name, String time, String open, String high, String low, String close, String volume, ConstCoin qCoin) {
+    private void write(String name, String time, String open, String high, String low, String close, String volume, Const.Coin qCoin) {
         try {
             String message = sqlMessage.insertDataCoin(name, time, open, high, low, close, volume, qCoin);
             statement = connection.createStatement();

@@ -1,8 +1,7 @@
 package com.mycompany.api_okex_binance_v2.drivers;
 
 import com.google.gson.Gson;
-import com.mycompany.api_okex_binance_v2.constants.ConstCoin;
-import com.mycompany.api_okex_binance_v2.constants.ConstTF;
+import com.mycompany.api_okex_binance_v2.constants.Const;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -27,13 +26,13 @@ public class DriverOkex {
         ArrayList<ArrayList<String>> list = new ArrayList<>(3);
 
         ArrayList<String> btc = new ArrayList<>();
-        btc.add(ConstCoin.BTC.toString());
+        btc.add(Const.Coin.BTC.toString());
 
         ArrayList<String> eth = new ArrayList<>();
-        eth.add(ConstCoin.ETH.toString());
+        eth.add(Const.Coin.ETH.toString());
 
         ArrayList<String> usdt = new ArrayList<>();
-        usdt.add(ConstCoin.USDT.toString());
+        usdt.add(Const.Coin.USDT.toString());
 
         StringBuilder sb = new StringBuilder();
         FileInputStream fis;
@@ -48,13 +47,13 @@ public class DriverOkex {
             Gson gson = new Gson();
             CoinOKEX[] pair = gson.fromJson(sb.toString(), CoinOKEX[].class);
             for (CoinOKEX cokex : pair) {
-                if (cokex.getQuote_currency().equals(ConstCoin.BTC.toString())) {
+                if (cokex.getQuote_currency().equals(Const.Coin.BTC.toString())) {
                     btc.add(cokex.getBase_currency());
                 }
-                if (cokex.getQuote_currency().equals(ConstCoin.ETH.toString())) {
+                if (cokex.getQuote_currency().equals(Const.Coin.ETH.toString())) {
                     eth.add(cokex.getBase_currency());
                 }
-                if (cokex.getQuote_currency().equals(ConstCoin.USDT.toString())) {
+                if (cokex.getQuote_currency().equals(Const.Coin.USDT.toString())) {
                     usdt.add(cokex.getBase_currency());
                 }
             }
@@ -112,8 +111,8 @@ public class DriverOkex {
         return sdf.format(new Date(unixFormat));
     }
     
-    public static String getTf(ConstTF constTF) {
-        switch (constTF) {
+    public static String getTf(Const.TF tf) {
+        switch (tf) {
             case HOUR_ONE:
                 return "3600";
             case HOUR_TWO:

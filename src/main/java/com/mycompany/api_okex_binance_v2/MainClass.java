@@ -1,7 +1,7 @@
 package com.mycompany.api_okex_binance_v2;
 
+import com.mycompany.api_okex_binance_v2.constants.Const;
 import com.mycompany.api_okex_binance_v2.database.CoinBigData;
-import com.mycompany.api_okex_binance_v2.constants.ConstExchange;
 import com.mycompany.api_okex_binance_v2.net.Connect;
 import java.util.ArrayList;
 import com.mycompany.api_okex_binance_v2.time.Time;
@@ -58,7 +58,7 @@ public class MainClass {
         
         
 
-        Connect connectOkex = new Connect(ConstExchange.EX_OKEX);
+        Connect connectOkex = new Connect(Const.Exchange.EX_OKEX);
         ArrayList<ArrayList<String>> list = connectOkex.getAllExInfo(); 
         if (list != null) {
             for (int i = 0; i < 3; i++) {
@@ -67,7 +67,7 @@ public class MainClass {
         } else {
             System.out.println("Ошибка");
         }
-        Connect connectBinance = new Connect(ConstExchange.EX_BINANCE);
+        Connect connectBinance = new Connect(Const.Exchange.EX_BINANCE);
         ArrayList<ArrayList<String>> list2 = connectBinance.getAllExInfo();
         if (list2 != null) {
             for (int i = 0; i < 3; i++) {

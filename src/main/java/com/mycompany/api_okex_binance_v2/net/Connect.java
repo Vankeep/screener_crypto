@@ -1,9 +1,7 @@
 package com.mycompany.api_okex_binance_v2.net;
 
 
-import com.mycompany.api_okex_binance_v2.constants.ConstCoin;
-import com.mycompany.api_okex_binance_v2.constants.ConstExchange;
-import com.mycompany.api_okex_binance_v2.database.CoinBigData;
+import com.mycompany.api_okex_binance_v2.constants.Const;
 import com.mycompany.api_okex_binance_v2.drivers.DriverBinance;
 import com.mycompany.api_okex_binance_v2.drivers.DriverOkex;
 import java.io.File;
@@ -17,10 +15,14 @@ import java.util.ArrayList;
 public class Connect {
     
     private ArrayList<ArrayList<String>> list;
-    private ConstExchange ex;
+    private Const.Exchange ex;
 
-    public Connect(ConstExchange ex) {
+    public Connect(Const.Exchange ex) {
         this.ex = ex;
+    }
+    
+    public boolean updateAllPair() {
+        return false;
     }
     /**
      * ВОЗВРАЩАЕТ СТРОГО ЗАДАННЫЕ ЗАРЕНЕЕ ПАРЫ К BTC ETH USDT
@@ -50,11 +52,5 @@ public class Connect {
     }
     
     
-    public boolean writeDB(ArrayList<ArrayList<String>> list){
-        return false;
-    }
-    
-    public boolean writeDB(ArrayList<ArrayList<CoinBigData>> list, ConstCoin constCoin){
-        return false;
-    }
+
 }
