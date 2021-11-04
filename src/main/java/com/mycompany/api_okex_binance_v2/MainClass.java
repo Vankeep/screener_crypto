@@ -5,11 +5,11 @@ import com.mycompany.api_okex_binance_v2.constants.ConstExchange;
 import com.mycompany.api_okex_binance_v2.net.Connect;
 import com.mycompany.api_okex_binance_v2.net.Driver;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 
+public class MainClass {
 
-public class MainClass {   
-    
     public String[] open;
     public String[] time;
     public String[] high;
@@ -17,7 +17,7 @@ public class MainClass {
     public String[] close;
     public String[] volume;
     CoinBigData name;
-    
+
     public static void main(String[] args) {
         MainClass mainClass = new MainClass();
         mainClass.momo();
@@ -42,18 +42,30 @@ public class MainClass {
 //        
 //        System.out.println(gumOK.getCoinData("BTC", ConstCoin.USDT, ConstTF.HOUR_ONE));
 //        System.out.println(gumBN.getCoinData("BTC", ConstCoin.USDT, ConstTF.HOUR_ONE));
-        
-        
+
         //Тру способ получить данные 
-        Connect Binance = new Connect(ConstExchange.EX_BINANCE);
-        ArrayList<ArrayList<String>> list = Binance.getAllExInfo();
-        File file = new File("binance.bin");
-        ArrayList<ArrayList<String>> list = Driver.fileToArrayListBINANCE(file);
-        for (int i = 0; i < 3; i++) {
-            System.out.println(list.get(i).toString());
+        /*
+        Connect connectBinance = new Connect(ConstExchange.EX_BINANCE);
+        ArrayList<ArrayList<String>> list = connectBinance.getAllExInfo();
+        if (list != null) {
+            for (int i = 0; i < 3; i++) {
+                System.out.println(list.get(i).toString());
+            }
+        } else {
+            System.out.println("Ошибка FileNotFoundException");
+        }
+        */
+        Connect connectOkex = new Connect(ConstExchange.EX_OKEX);
+        ArrayList<ArrayList<String>> list = connectOkex.getAllExInfo();
+        if (list != null) {
+            for (int i = 0; i < 3; i++) {
+                System.out.println(list.get(i).toString());
+            }
+        } else {
+            System.out.println("Ошибка");
         }
         
         
-        
+
     }
 }

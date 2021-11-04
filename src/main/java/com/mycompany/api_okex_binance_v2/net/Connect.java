@@ -9,7 +9,6 @@ import java.net.*;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
-import java.util.TreeSet;
 
 public class Connect {
 
@@ -20,7 +19,7 @@ public class Connect {
     }
     /**
      * ВОЗВРАЩАЕТ СТРОГО ЗАДАННЫЕ ЗАРЕНЕЕ ПАРЫ К BTC ETH USDT
-     * @return 
+     * @return 1 - BTC, 2 - ETH, 3 - USDT, если проблемы с файлом вернет null;
      */
     public ArrayList<ArrayList<String>> getAllExInfo() {
         GenerateUrlMessage url = new GenerateUrlMessage(ex);
@@ -36,7 +35,9 @@ public class Connect {
         }
         switch (ex) {
             case EX_BINANCE:
-                return Driver.fileToArrayListBINANCE(file);
+                return Driver.fileToArrayBINANCE(file);
+            case EX_OKEX:
+                return Driver.fileToArrayOKEX(file);
             default:
                 return null;
         }

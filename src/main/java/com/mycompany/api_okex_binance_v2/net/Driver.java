@@ -1,19 +1,22 @@
 package com.mycompany.api_okex_binance_v2.net;
 
+import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mycompany.api_okex_binance_v2.constants.ConstCoin;
 import com.mycompany.api_okex_binance_v2.constants.ConstExchange;
 import com.mycompany.api_okex_binance_v2.constants.ConstTF;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.TreeSet;
+
 /**
- * dgfjshgfjdg
+ * Класс помогает соствковать несостыкуемое
+ *
  * @author Asus
  */
 public class Driver {
@@ -45,7 +48,13 @@ public class Driver {
         }
     }
 
-    public static ArrayList<ArrayList<String>> fileToArrayListBINANCE(File fail) {
+    /**
+     * Биржа BINANCE. Конвертирует файл с json в двумерный массив.
+     *
+     * @param fail файл с json
+     * @return возвращает двумерный массив
+     */
+    public static ArrayList<ArrayList<String>> fileToArrayBINANCE(File fail) {
         ArrayList<ArrayList<String>> list = new ArrayList<>(3);
         ArrayList<String> btc = new ArrayList<>();
         btc.add("1");
@@ -53,8 +62,6 @@ public class Driver {
         eth.add("2");
         ArrayList<String> usdt = new ArrayList<>();
         usdt.add("3");
-        
-
         try {
             FileReader fileReader = new FileReader(fail);
             JsonElement jsonElement = JsonParser.parseReader(fileReader);
@@ -80,11 +87,82 @@ public class Driver {
 
         } catch (FileNotFoundException e) {
             System.out.println(e.getMessage());
+            return null;
         }
         list.add(btc);
         list.add(eth);
         list.add(usdt);
         return list;
+    }
+
+    /**
+     * Биржа OKEX. Конвертирует файл с json в двумерный массив.
+     *
+     * @param fail файл с json
+     * @return возвращает двумерный массив
+     */
+    public static ArrayList<ArrayList<String>> fileToArrayOKEX(File fail) {
+        ArrayList<ArrayList<String>> list = new ArrayList<>(3);
+        ArrayList<String> btc = new ArrayList<>();
+        btc.add("1");
+        ArrayList<String> eth = new ArrayList<>();
+        eth.add("2");
+        ArrayList<String> usdt = new ArrayList<>();
+        usdt.add("3");
+
+        StringBuilder sb = new StringBuilder();
+        FileInputStream fis;
+        try {
+            fis = new FileInputStream(fail);
+            int c;
+            while ((c = fis.read()) != -1) {
+                sb.append((char) c);
+            }
+            fis.close();
+
+            Gson gson = new Gson();
+            CoinOKEX[] pair = gson.fromJson(sb.toString(), CoinOKEX[].class);
+            for (CoinOKEX cokex : pair) {
+                if (cokex.getQuote_currency().equals("BTC")) {
+                    btc.add(cokex.getBase_currency());
+                }
+                if (cokex.getQuote_currency().equals("ETH")) {
+                    eth.add(cokex.getBase_currency());
+                }
+                if (cokex.getQuote_currency().equals("USDT")) {
+                    usdt.add(cokex.getBase_currency());
+                }
+            }
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            return null;
+        }
+        list.add(btc);
+        list.add(eth);
+        list.add(usdt);
+        return list;
+    }
+    /**
+     * Создан для сортировки в методе fileToArrayOKEX
+     */
+    class CoinOKEX {
+
+        String base_currency;
+        String quote_currency;
+
+        public CoinOKEX(String base_currency, String quote_currency) {
+            this.base_currency = base_currency;
+            this.quote_currency = quote_currency;
+        }
+
+        public String getBase_currency() {
+            return base_currency;
+        }
+
+        public String getQuote_currency() {
+            return quote_currency;
+        }
+
     }
 
 }

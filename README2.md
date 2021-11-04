@@ -3,7 +3,13 @@
 
 В `list` возвращается три массива со всеми парами биржи: BTC, ETH, USDT.
 ```java
-Connect Binance = new Connect(ConstExchange.EX_BINANCE);
-ArrayList<ArrayList<String>> list = Binance.getAllExInfo();
+        Connect connectOkex = new Connect(ConstExchange.EX_OKEX);
+        ArrayList<ArrayList<String>> list = connectOkex.getAllExInfo();
+        if (list != null) {
+                //дальнейшие действия с массивом
+            }
+        } else {
+        System.out.println("Ошибка");
+        }
 ```
 
