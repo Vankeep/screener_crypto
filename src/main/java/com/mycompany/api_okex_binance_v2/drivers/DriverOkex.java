@@ -23,7 +23,7 @@ public class DriverOkex {
      */
     public static ArrayList<ArrayList<String>> fileToArrayOKEX(File fail) {
         System.out.println("Перетаскиваю даные из okex.bin в массив....");
-        ArrayList<ArrayList<String>> list = new ArrayList<>(3);
+        ArrayList<ArrayList<String>> list = new ArrayList<>();
 
         ArrayList<String> btc = new ArrayList<>();
         btc.add(Const.Coin.BTC.toString());

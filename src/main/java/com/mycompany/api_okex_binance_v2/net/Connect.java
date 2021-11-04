@@ -1,6 +1,5 @@
 package com.mycompany.api_okex_binance_v2.net;
 
-import com.mycompany.api_okex_binance_v2.ApiClient;
 import com.mycompany.api_okex_binance_v2.constants.Const;
 import com.mycompany.api_okex_binance_v2.database.Database;
 import com.mycompany.api_okex_binance_v2.drivers.DriverBinance;
@@ -12,8 +11,9 @@ import java.net.*;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
+import com.mycompany.api_okex_binance_v2.HttpClient;
 
-public class Connect implements ApiClient {
+public class Connect implements HttpClient {
 
     private ArrayList<ArrayList<String>> list;
     private Const.Exchange ex;
@@ -32,7 +32,7 @@ public class Connect implements ApiClient {
      */
     public ArrayList<ArrayList<String>> getAllExInfo() {
         GenerateUrlMessage url = new GenerateUrlMessage(ex);
-        File file = new File(ex.getName() + ".bin");
+        File file = new File(Const.PATH_DATABASE()+ex.getName() + ".bin");
         System.out.println("Загружаю все пары в файл " + file.toString() + "....");
         try {
             ReadableByteChannel rbc = Channels.newChannel(new URL(url.getAllCoinsData()).openStream());

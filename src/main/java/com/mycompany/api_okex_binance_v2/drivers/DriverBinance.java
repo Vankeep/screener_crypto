@@ -20,7 +20,7 @@ public class DriverBinance {
      */
     public static ArrayList<ArrayList<String>> fileToArrayBINANCE(File fail) {
         System.out.println("Перетаскиваю даные из binance.bin в массив...." );
-        ArrayList<ArrayList<String>> list = new ArrayList<>(3);
+        ArrayList<ArrayList<String>> list = new ArrayList<>();
 
         ArrayList<String> btc = new ArrayList<>();
         btc.add(Const.Coin.BTC.toString());

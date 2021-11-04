@@ -2,17 +2,17 @@ package com.mycompany.api_okex_binance_v2.database;
 
 import com.mycompany.api_okex_binance_v2.DatabaseClient;
 import com.mycompany.api_okex_binance_v2.constants.Const;
+import java.io.File;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Database implements DatabaseClient {
-
     GenerateSqlMessage sqlMessage = new GenerateSqlMessage();
     Connection connection;
     Statement statement;
     Const.Exchange exchange;
-
+    
     public Database(Const.Exchange exchange) {
         this.exchange = exchange;
     }
@@ -33,7 +33,7 @@ public class Database implements DatabaseClient {
     private boolean connect() {
         try {
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("JDBC:sqlite:" + exchange.getName() + ".db");
+            connection = DriverManager.getConnection("JDBC:sqlite:"+Const.PATH_DATABASE()+ exchange.getName() + ".db");
             System.out.println("База данных подключена");
             return true;
         } catch (ClassNotFoundException | SQLException ex) {

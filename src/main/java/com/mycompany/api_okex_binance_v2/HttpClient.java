@@ -5,7 +5,7 @@ import com.mycompany.api_okex_binance_v2.constants.Const;
 
 
 
-public interface ApiClient {
+public interface HttpClient {
     
     public abstract boolean updateAllPair();
     
