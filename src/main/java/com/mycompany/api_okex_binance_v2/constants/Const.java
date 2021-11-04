@@ -34,5 +34,9 @@ public class Const {
     public enum TF{
         HOUR_ONE, HOUR_TWO, HOUR_FOUR, HOUR_SIX, HOUR_TWENTY, DAY_ONE;
     }
+    
+    public enum OHLC{
+        OPEN, HIGH, LOW, CLOSE;
+    }
 
 }

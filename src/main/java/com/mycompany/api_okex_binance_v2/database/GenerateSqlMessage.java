@@ -1,40 +1,24 @@
 package com.mycompany.api_okex_binance_v2.database;
 
-import com.mycompany.api_okex_binance_v2.constants.Const;
-
-
 public class GenerateSqlMessage {
 
-    //Таблицы
     /**
-     * Создание таблицы на случай листинга
+     * Создание таблицы на случай листинга.
+     * <p>
+     * Заголовки таблицы: time, open, high, low, close, volume
+     * <p>
+     * Имя таблицы: BTC_USDT
      *
-     * @param coin монета для добавления
-     * @return строка
-     */
-    public String createNewTable(CoinBigData coin) {
-
-        String message = "CREATE TABLE " + coin.getName() + "_" + coin.getqCoin().toString() + " ("
-                + " time LONG,"
-                + " open VARCHAR(30),"
-                + " high VARCHAR(30),"
-                + " low VARCHAR(30),"
-                + " close VARCHAR(30),"
-                + " volume VARCHAR(30))";
-        return message;
-    }
-
-    /**
-     * Создание таблицы на случай листинга
-     *
-     * @param coin базовая монета
+     * @param bCoin базовая монета
      * @param qCoin монета котировки
-     * @return строка
+     * @return CREATE TABLE bCoin_qCoin ( time VARCHAR(30), open VARCHAR(30),
+     *         high VARCHAR(30), low VARCHAR(30), close VARCHAR(30), volume
+     *         VARCHAR(30))
      */
-    public String createNewTable(String coin, Const.Coin qCoin) {
+    public String createTable(String bCoin, String qCoin) {
 
-        String message = "CREATE TABLE " + coin + "_" + qCoin.toString() + " ("
-                + " time LONG,"
+        String message = "CREATE TABLE " + bCoin + "_" + qCoin + " ("
+                + " time VARCHAR(30),"
                 + " open VARCHAR(30),"
                 + " high VARCHAR(30),"
                 + " low VARCHAR(30),"
@@ -46,84 +30,61 @@ public class GenerateSqlMessage {
     /**
      * Удаление таблицы монеты на случай делистинга
      *
-     * @param coin монета для удаления
-     * @return строка
-     *
-     */
-    public String deleteTable(CoinBigData coin) {
-        return "DROP TABLE " + coin.getName() + "_" + coin.getqCoin().toString();
-    }
-
-    /**
-     * Удаление таблицы монеты на случай делистинга
-     *
-     * @param coin базовая монета
+     * @param bCoin базовая монета
      * @param qCoin монета котировки
-     * @return строка
+     * @return DROP TABLE bCoin_qCoin
      */
-    public String deleteTable(String coin, Const.Coin qCoin) {
-        return "DROP TABLE " + coin + "_" + qCoin.toString();
+    public String deleteTable(String bCoin, String qCoin) {
+        return "DROP TABLE " + bCoin + "_" + qCoin;
     }
 
     /**
      * Создание таблицы всех монет
+     * <p>
+     * Заголовки таблицы: id, nameCoin
+     * <p>
+     * Имя таблицы: BTC
+     * <p>
+     * CREATE TABLE nameTable ( id INTEGER PRIMARY KEY AUTOINCREMENT, nameCoin
+     * VARCHAR(10))
      *
-     * @param qCoin монета котировки
+     * @param nameTable имя таблицы
      * @return строка
      */
-    public String createNewTable(Const.Coin qCoin) {
-
-        String message = "CREATE TABLE " + qCoin.toString() + " ("
+    public String createTable(String nameTable) {
+        String message = "CREATE TABLE " + nameTable + " ("
                 + " id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + " coin VARCHAR(10))";
+                + " nameCoin VARCHAR(10))";
         return message;
     }
 
     /**
      * Удаление таблицы всех монет
      *
-     * @param qCoin монета коритовки
-     * @return строка
+     * @param nameTable монета коритовки
+     * @return DROP TABLE nameTable
      */
-    public String deleteTable(Const.Coin qCoin) {
-        return "DROP TABLE " + qCoin.toString();
+    public String deleteTable(String nameTable) {
+        return "DROP TABLE " + nameTable;
     }
 
     //Данные
     /**
-     * Добавление данных
+     * Добаление данных в таблицу со значениями
      *
-     * @param coin базовая монета
-     * @param index индекс элементов массива цен, времени и даты
-     * @return строка
-     */
-    public String insertDataCoin(CoinBigData coin, int index) {
-        String message = "INSERT INTO " + coin.getName() + "_" + coin.getqCoin().toString() + " ( time, open, high, low, close, volume)"
-                + " VALUES ( '"
-                + coin.getTime(index) + "', '"
-                + coin.getOpen(index) + "', '"
-                + coin.getHigh(index) + "', '"
-                + coin.getLow(index) + "', '"
-                + coin.getClose(index) + "', '"
-                + coin.getVolume(index) + "')";
-        return message;
-    }
-
-    /**
-     * Добаление данных
-     *
-     * @param name монета для которой все записывается
+     * @param bCoin базовая монета
+     * @param qCoin монета коритовки
      * @param time время закрытия свечи
      * @param open ценая открытия
      * @param high самая верхняя цена
      * @param low самая нижняя цена
      * @param close цена закрытия
      * @param volume обьем
-     * @param qCoin монета коритовки
-     * @return строка
+     * @return INSERT INTO bCoin_qCoin ( time, open, high, low, close, volume)
+     *         VALUES ('123', '321', '234', '123', '345', '654') 
      */
-    public String insertDataCoin(String name, String time, String open, String high, String low, String close, String volume, Const.Coin qCoin) {
-        String message = "INSERT INTO " + name + "_" + qCoin.toString() + " ( time, open, high, low, close, volume)"
+    public String insertBcoin(String bCoin, String qCoin, String time, String open, String high, String low, String close, String volume) {
+        String message = "INSERT INTO " + bCoin + "_" + qCoin + " ( time, open, high, low, close, volume)"
                 + " VALUES ( '"
                 + time + "', '"
                 + open + "', '"
@@ -132,27 +93,39 @@ public class GenerateSqlMessage {
                 + close + "', '"
                 + volume + "')";
         return message;
+
     }
 
     /**
-     * Получение данных
+     * Добавление в таблицу со списом всех пар
      *
-     * @param coin базовая монета
-     * @return строка
+     * @param nameTable имя таблицы
+     * @param bCoin монета для втавки
+     * @return INSERT INTO nameTable ( nameCoin ) VALUES ( 'bCoin' )
      */
-    public String readDataCoin(CoinBigData coin) {
-        return "SELECT time, open, high, low, close, volume FROM " + coin.getName() + "_" + coin.getqCoin().toString();
+    public String insertQcoin(String nameTable, String bCoin) {
+        return "INSERT INTO " + nameTable + " ( nameCoin ) VALUES ( '" + bCoin + "' )";
     }
 
     /**
-     * Получение данных
+     * Получение данных из таблиц с данными
      *
-     * @param coin базовая монета
+     * @param bCoin базовая монета
      * @param qCoin монета котировки
-     * @return строка
+     * @return SELECT time, open, high, low, close, volume FROM bCoin_qCoin
      */
-    public String readDataCoin(String coin, Const.Coin qCoin) {
-        return "SELECT time, open, high, low, close, volume FROM " + coin + "_" + qCoin.toString();
+    public String readBcoin(String bCoin, String qCoin) {
+        return "SELECT time, open, high, low, close, volume FROM " + bCoin + "_" + qCoin;
+    }
+    
+    /**
+     * Получение всей таблицы со списком монет
+     *
+     * @param qCoin монета котировки
+     * @return SELECT nameCoin FROM qCoin
+     */
+    public String readQcoin(String qCoin) {
+        return "SELECT nameCoin FROM " + qCoin;
     }
 
 }

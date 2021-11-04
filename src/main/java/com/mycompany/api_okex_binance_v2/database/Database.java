@@ -1,11 +1,13 @@
 package com.mycompany.api_okex_binance_v2.database;
 
+import com.mycompany.api_okex_binance_v2.DatabaseClient;
 import com.mycompany.api_okex_binance_v2.constants.Const;
 import java.sql.*;
+import java.util.ArrayList;
 
-public class Database {
+public class Database implements DatabaseClient{
 
-    GenerateSqlMessage sqlMessage;
+    GenerateSqlMessage sqlMessage = new GenerateSqlMessage();
     Connection connection;
     Statement statement;
     Const.Exchange exchange;
@@ -38,42 +40,21 @@ public class Database {
             return false;
         }
     }
-
-    private void write(CoinBigData coin) {
+    
+    private void write(String message) {
         try {
-            long counter = coin.getClose().length;
-            for (int i = 0; i < counter; i++) {
-                String message = sqlMessage.insertDataCoin(coin, i);
-                statement = connection.createStatement();
-                statement.executeUpdate(message);
-            }
-
-            System.out.println("Данные успешно записаны в базу");
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-
-    }
-
-    private void write(String name, String time, String open, String high, String low, String close, String volume, Const.Coin qCoin) {
-        try {
-            String message = sqlMessage.insertDataCoin(name, time, open, high, low, close, volume, qCoin);
             statement = connection.createStatement();
             statement.executeUpdate(message);
-            System.out.println("Данные успешно записаны в базу");
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
 
     }
 
-    private void read() {
+    private void read(String message) {
         try {
-            String value = "SELECT тут запись"
-                    + " FROM last";
-
             statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(value);
+            ResultSet rs = statement.executeQuery(message);
 
             while (rs.next()) {
                 double a = rs.getDouble("BTC");
@@ -87,10 +68,56 @@ public class Database {
 
     private void close() {
         try {
+            System.out.println("База данных отключена");
             connection.close();
         } catch (SQLException ex) {
             System.out.println(ex.getMessage());
         }
     }
+    
+    public boolean insertAllPairToDatabase(ArrayList<ArrayList<String>> list) {
+        if(connect()){
+            for (ArrayList<String> arrayList : list) {
+                System.out.println("Запись пар к "+arrayList.get(0)+"...");
+                write(sqlMessage.deleteTable(arrayList.get(0)));
+                write(sqlMessage.createTable(arrayList.get(0)));
+                for (int i = 1; i < arrayList.size(); i++) {
+                    write(sqlMessage.insertQcoin(arrayList.get(0), arrayList.get(i)));
+                }
+            }
+            close();
+            return true;
+        } else {
+            return false;
+        }
+        
+        
+    }
+    
+    @Override
+    public String[] getAllPair(Const.Coin qCoin) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
 
+    @Override
+    public long[] getDataCoin(Const.TF tf, String bCoin, Const.Coin qCoin, Const.OHLC ohlc) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public long[][] getDataCoin(Const.TF tf, String bCoin, Const.Coin qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public long[][] getDataCoin(Const.TF tf, String bCoin, Const.Coin qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2, Const.OHLC ohlc3) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public long[][] getDataCoin(Const.TF tf, String bCoin, Const.Coin qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2, Const.OHLC ohlc3, Const.OHLC ohlc4) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+  
 }

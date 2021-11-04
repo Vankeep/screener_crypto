@@ -2,8 +2,9 @@ package com.mycompany.api_okex_binance_v2;
 
 import com.mycompany.api_okex_binance_v2.constants.Const;
 import com.mycompany.api_okex_binance_v2.database.CoinBigData;
+import com.mycompany.api_okex_binance_v2.database.Database;
+import com.mycompany.api_okex_binance_v2.database.GenerateSqlMessage;
 import com.mycompany.api_okex_binance_v2.net.Connect;
-import java.util.ArrayList;
 import com.mycompany.api_okex_binance_v2.time.Time;
 
 public class MainClass {
@@ -21,9 +22,7 @@ public class MainClass {
         mainClass.momo();
 
     }
-    public void test(){
-        Time.fd();
-    }
+    
     public void momo() {
 //        GenerateSqlMessage gsm = new GenerateSqlMessage();
 //        time = new String[]{"1635747564", "1635747564", "1635747564", "1635747564"};
@@ -55,29 +54,22 @@ public class MainClass {
             System.out.println("Ошибка FileNotFoundException");
         }
         */
-        
-        
-
-        Connect connectOkex = new Connect(Const.Exchange.EX_OKEX);
-        ArrayList<ArrayList<String>> list = connectOkex.getAllExInfo(); 
-        if (list != null) {
-            for (int i = 0; i < 3; i++) {
-                System.out.println(list.get(i).toString());
-            }
+        boolean ok = false;
+        ApiClient okex = new Connect(Const.Exchange.EX_OKEX);
+        ok = okex.updateAllPair();
+        if (ok) {
+            System.out.println("Данные в базе");
         } else {
-            System.out.println("Ошибка");
+            System.out.println("Ничего не записалось");
         }
-        Connect connectBinance = new Connect(Const.Exchange.EX_BINANCE);
-        ArrayList<ArrayList<String>> list2 = connectBinance.getAllExInfo();
-        if (list2 != null) {
-            for (int i = 0; i < 3; i++) {
-                System.out.println(list2.get(i).toString());
-            }
-        } else {
-            System.out.println("Ошибка");
+        ApiClient binance = new Connect(Const.Exchange.EX_BINANCE);
+        ok = binance.updateAllPair();
+        if(ok){
+            System.out.println("Данные в базе");
+        }else{
+            System.out.println("Ничего не записалось");
         }
         
-
         
         
 
