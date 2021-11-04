@@ -3,10 +3,8 @@ package com.mycompany.api_okex_binance_v2;
 import com.mycompany.api_okex_binance_v2.database.CoinBigData;
 import com.mycompany.api_okex_binance_v2.constants.ConstExchange;
 import com.mycompany.api_okex_binance_v2.net.Connect;
-import com.mycompany.api_okex_binance_v2.net.Driver;
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import com.mycompany.api_okex_binance_v2.time.Time;
 
 public class MainClass {
 
@@ -23,7 +21,9 @@ public class MainClass {
         mainClass.momo();
 
     }
-
+    public void test(){
+        Time.fd();
+    }
     public void momo() {
 //        GenerateSqlMessage gsm = new GenerateSqlMessage();
 //        time = new String[]{"1635747564", "1635747564", "1635747564", "1635747564"};
@@ -55,8 +55,11 @@ public class MainClass {
             System.out.println("Ошибка FileNotFoundException");
         }
         */
+        
+        
+
         Connect connectOkex = new Connect(ConstExchange.EX_OKEX);
-        ArrayList<ArrayList<String>> list = connectOkex.getAllExInfo();
+        ArrayList<ArrayList<String>> list = connectOkex.getAllExInfo(); 
         if (list != null) {
             for (int i = 0; i < 3; i++) {
                 System.out.println(list.get(i).toString());
@@ -64,6 +67,17 @@ public class MainClass {
         } else {
             System.out.println("Ошибка");
         }
+        Connect connectBinance = new Connect(ConstExchange.EX_BINANCE);
+        ArrayList<ArrayList<String>> list2 = connectBinance.getAllExInfo();
+        if (list2 != null) {
+            for (int i = 0; i < 3; i++) {
+                System.out.println(list2.get(i).toString());
+            }
+        } else {
+            System.out.println("Ошибка");
+        }
+        
+
         
         
 

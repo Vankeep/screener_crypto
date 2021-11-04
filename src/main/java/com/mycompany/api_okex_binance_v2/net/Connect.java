@@ -1,7 +1,11 @@
 package com.mycompany.api_okex_binance_v2.net;
 
 
+import com.mycompany.api_okex_binance_v2.constants.ConstCoin;
 import com.mycompany.api_okex_binance_v2.constants.ConstExchange;
+import com.mycompany.api_okex_binance_v2.database.CoinBigData;
+import com.mycompany.api_okex_binance_v2.drivers.DriverBinance;
+import com.mycompany.api_okex_binance_v2.drivers.DriverOkex;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -11,7 +15,8 @@ import java.nio.channels.ReadableByteChannel;
 import java.util.ArrayList;
 
 public class Connect {
-
+    
+    private ArrayList<ArrayList<String>> list;
     private ConstExchange ex;
 
     public Connect(ConstExchange ex) {
@@ -35,13 +40,21 @@ public class Connect {
         }
         switch (ex) {
             case EX_BINANCE:
-                return Driver.fileToArrayBINANCE(file);
+                return DriverBinance.fileToArrayBINANCE(file);
             case EX_OKEX:
-                return Driver.fileToArrayOKEX(file);
+                return DriverOkex.fileToArrayOKEX(file);
             default:
                 return null;
         }
 
     }
-
+    
+    
+    public boolean writeDB(ArrayList<ArrayList<String>> list){
+        return false;
+    }
+    
+    public boolean writeDB(ArrayList<ArrayList<CoinBigData>> list, ConstCoin constCoin){
+        return false;
+    }
 }
