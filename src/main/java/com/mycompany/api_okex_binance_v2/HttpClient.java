@@ -1,15 +1,15 @@
 package com.mycompany.api_okex_binance_v2;
 
-import com.mycompany.api_okex_binance_v2.constants.Const;
+import com.mycompany.api_okex_binance_v2.enums.Coin;
 
 
 
 
 public interface HttpClient {
     
-    public abstract boolean updateAllPair();
+    public boolean updateAllPair();
     
-    public abstract boolean updateCoinData(String bCoin, Const.COIN qCoin);
+    public boolean updateCoinData(String bCoin, Coin qCoin);
     
     
 }

@@ -1,7 +1,8 @@
 package com.mycompany.api_okex_binance_v2.drivers;
 
 import com.google.gson.Gson;
-import com.mycompany.api_okex_binance_v2.constants.Const;
+import com.mycompany.api_okex_binance_v2.enums.Coin;
+import com.mycompany.api_okex_binance_v2.enums.Tf;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,9 +10,13 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 public class DriverOkex {
     
+    private static final Logger logger = LoggerFactory.getLogger(DriverOkex.class.getSimpleName());
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     /**
@@ -22,17 +27,17 @@ public class DriverOkex {
      * @return возвращает двумерный массив
      */
     public static ArrayList<ArrayList<String>> fileToArrayOKEX(File fail) {
-        System.out.println("Перетаскиваю даные из okex.bin в массив....");
+        logger.info("Перетаскиваю даные из okex.bin в массив");
         ArrayList<ArrayList<String>> list = new ArrayList<>();
 
         ArrayList<String> btc = new ArrayList<>();
-        btc.add(Const.COIN.BTC.toString());
+        btc.add(Coin.BTC.toString());
 
         ArrayList<String> eth = new ArrayList<>();
-        eth.add(Const.COIN.ETH.toString());
+        eth.add(Coin.ETH.toString());
 
         ArrayList<String> usdt = new ArrayList<>();
-        usdt.add(Const.COIN.USDT.toString());
+        usdt.add(Coin.USDT.toString());
 
         StringBuilder sb = new StringBuilder();
         FileInputStream fis;
@@ -47,18 +52,18 @@ public class DriverOkex {
             Gson gson = new Gson();
             CoinOKEX[] pair = gson.fromJson(sb.toString(), CoinOKEX[].class);
             for (CoinOKEX cokex : pair) {
-                if (cokex.getQuote_currency().equals(Const.COIN.BTC.toString())) {
+                if (cokex.getQuote_currency().equals(Coin.BTC.toString())) {
                     btc.add(cokex.getBase_currency());
                 }
-                if (cokex.getQuote_currency().equals(Const.COIN.ETH.toString())) {
+                if (cokex.getQuote_currency().equals(Coin.ETH.toString())) {
                     eth.add(cokex.getBase_currency());
                 }
-                if (cokex.getQuote_currency().equals(Const.COIN.USDT.toString())) {
+                if (cokex.getQuote_currency().equals(Coin.USDT.toString())) {
                     usdt.add(cokex.getBase_currency());
                 }
             }
         } catch (IOException ex) {
-            System.out.println(ex.getMessage());
+            logger.error("Проблемы с файлом binance.bin, return null {}", ex.getMessage());
             return null;
         }
         list.add(btc);
@@ -98,11 +103,12 @@ public class DriverOkex {
      */
     public static long isoToUnixOKEX(String isoFormat) {
         long unixDataTime = 0;
+        Date date;
         try {
-            Date date = sdf.parse(isoFormat);
+            date = sdf.parse(isoFormat);
             unixDataTime = date.getTime();
-        } catch (ParseException e) {
-            System.out.println("Несовпадение формата даты " + e.getMessage());
+        } catch (ParseException ex) {
+            System.err.println(ex.getMessage());
         }
         return unixDataTime;
     }
@@ -111,7 +117,7 @@ public class DriverOkex {
         return sdf.format(new Date(unixFormat));
     }
     
-    public static String getTf(Const.TF tf) {
+    public static String getTf(Tf tf) {
         switch (tf) {
             case HOUR_ONE:
                 return "3600";

@@ -4,13 +4,17 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.mycompany.api_okex_binance_v2.constants.Const;
+import com.mycompany.api_okex_binance_v2.enums.Coin;
+import com.mycompany.api_okex_binance_v2.enums.Tf;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.util.ArrayList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class DriverBinance {
+    private static final Logger logger = LoggerFactory.getLogger(DriverBinance.class.getSimpleName());
     /**
      * Биржа BINANCE. Конвертирует файл с json в двумерный массив. В каждом
      * подмасивве первое число массива это quote_currency этого массива
@@ -19,17 +23,17 @@ public class DriverBinance {
      * @return возвращает двумерный массив
      */
     public static ArrayList<ArrayList<String>> fileToArrayBINANCE(File fail) {
-        System.out.println("Перетаскиваю даные из binance.bin в массив...." );
+        logger.info("Перетаскиваю даные из binance.bin в массив");
         ArrayList<ArrayList<String>> list = new ArrayList<>();
 
         ArrayList<String> btc = new ArrayList<>();
-        btc.add(Const.COIN.BTC.toString());
+        btc.add(Coin.BTC.toString());
 
         ArrayList<String> eth = new ArrayList<>();
-        eth.add(Const.COIN.ETH.toString());
+        eth.add(Coin.ETH.toString());
 
         ArrayList<String> usdt = new ArrayList<>();
-        usdt.add(Const.COIN.USDT.toString());
+        usdt.add(Coin.USDT.toString());
         try {
             FileReader fileReader = new FileReader(fail);
             JsonElement jsonElement = JsonParser.parseReader(fileReader);
@@ -41,20 +45,20 @@ public class DriverBinance {
                 String baseAsset = symbolJsonObj.get("baseAsset").getAsString();
                 String quoteAsset = symbolJsonObj.get("quoteAsset").getAsString();
                 if (status.equals("TRADING")) {
-                    if (quoteAsset.equals(Const.COIN.BTC.toString())) {
+                    if (quoteAsset.equals(Coin.BTC.toString())) {
                         btc.add(baseAsset);
                     }
-                    if (quoteAsset.equals(Const.COIN.ETH.toString())) {
+                    if (quoteAsset.equals(Coin.ETH.toString())) {
                         eth.add(baseAsset);
                     }
-                    if (quoteAsset.equals(Const.COIN.USDT.toString())) {
+                    if (quoteAsset.equals(Coin.USDT.toString())) {
                         usdt.add(baseAsset);
                     }
                 }
             }
 
         } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
+            logger.error("Проблемы с файлом binance.bin, return null ", e.getMessage());
             return null;
         }
         list.add(btc);
@@ -63,7 +67,9 @@ public class DriverBinance {
         return list;
     }
     
-    public static String getTf(Const.TF tf){
+    
+    
+    public static String getTf(Tf tf){
         switch (tf) {
             case HOUR_ONE:
                 return "1h";

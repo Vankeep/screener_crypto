@@ -1,129 +1,73 @@
 package com.mycompany.api_okex_binance_v2.database;
 
 import com.mycompany.api_okex_binance_v2.DatabaseClient;
-import com.mycompany.api_okex_binance_v2.constants.Const;
-import java.io.File;
-import java.sql.*;
+import com.mycompany.api_okex_binance_v2.enums.*;
+import com.mycompany.api_okex_binance_v2.obj.Сurrency;
 import java.util.ArrayList;
 import java.util.HashMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-public class Database implements DatabaseClient {
-    GenerateSqlMessage sqlMessage = new GenerateSqlMessage();
-    Connection connection;
-    Statement statement;
-    Const.EXCHANGE exchange;
-    
-    public Database(Const.EXCHANGE exchange) {
-        this.exchange = exchange;
-    }
+public class Database extends DatabsIR implements DatabaseClient {
 
-    public void go() {
-        if (connect()) {
-            //database.write();
-            //read();
-            close();
-        }
-    }
+    private static final Logger logger = LoggerFactory.getLogger(Database.class.getSimpleName());
 
-    /**
-     * Подключение к БД
-     *
-     * @return true - успех, false - неудачное подключение
-     */
-    private boolean connect() {
-        try {
-            Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("JDBC:sqlite:"+Const.PATH_DATABASE()+ exchange.getName() + ".db");
-            System.out.println("База данных подключена");
-            return true;
-        } catch (ClassNotFoundException | SQLException ex) {
-            System.out.println(ex.getMessage());
-            return false;
-        }
-    }
-
-    private void write(String message) {
-        try {
-            statement = connection.createStatement();
-            statement.executeUpdate(message);
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-
-    }
-
-    private HashMap<Integer,String> readQcoin(String message) {
-        HashMap<Integer,String> map = new HashMap<>();
-        try {
-            statement = connection.createStatement();
-            ResultSet rs = statement.executeQuery(message);
-
-            while (rs.next()) {
-                int key = rs.getInt("id");
-                String nameCoin = rs.getString("nameCoin");
-                map.put(key, nameCoin);
-            }
-
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
-        return map;
-    }
-
-    private void close() {
-        try {
-            System.out.println("База данных отключена");
-            connection.close();
-        } catch (SQLException ex) {
-            System.out.println(ex.getMessage());
-        }
+    public Database(Exchange exchange) {
+        super(exchange);
     }
 
     public boolean insertAllPairToDatabase(ArrayList<ArrayList<String>> list) {
-        if (connect()) {
+        if (connect() && list != null) {
             for (ArrayList<String> arrayList : list) {
-                System.out.println("Запись пар к " + arrayList.get(0) + "...");
-                write(sqlMessage.deleteTable(arrayList.get(0)));
-                write(sqlMessage.createTable(arrayList.get(0)));
+                logger.info("Запись пар к {}", arrayList.get(0));
+                insert(sqlMessage.deleteTable(arrayList.get(0)));
+                insert(sqlMessage.createTable(arrayList.get(0)));
                 for (int i = 1; i < arrayList.size(); i++) {
-                    write(sqlMessage.insertQcoin(arrayList.get(0), arrayList.get(i)));
+                    insert(sqlMessage.insertQcoin(arrayList.get(0), arrayList.get(i)));
                 }
             }
             close();
             return true;
         } else {
+            logger.info("Неудачное подключение к бд или ArrayList пустой");
             return false;
         }
 
     }
 
     @Override
-    public HashMap<Integer,String> getAllPair(Const.COIN qCoin) {
-        if(connect()){
-            HashMap<Integer,String> map = readQcoin(sqlMessage.readQcoin(qCoin));
-            close();
-            return map;
+    public HashMap<Integer, String> getAllPair(Coin qCoin) {
+        if (connect()) {
+            try {
+                HashMap<Integer, String> map = readAllPair(sqlMessage.readQcoin(qCoin));
+                close();
+                return map;
+            } catch (NullPointerException ex) {
+                logger.error("HashMap пустой. {}", ex.getMessage());
+                close();
+                return null;
+            }
         }
         return null;
     }
 
     @Override
-    public long[] getDataCoin(Const.TF tf, String bCoin, Const.COIN qCoin, Const.OHLC ohlc) {
+    public ArrayList<Сurrency> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public long[][] getDataCoin(Const.TF tf, String bCoin, Const.COIN qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2) {
+    public ArrayList<Сurrency> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public long[][] getDataCoin(Const.TF tf, String bCoin, Const.COIN qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2, Const.OHLC ohlc3) {
+    public ArrayList<Сurrency> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public long[][] getDataCoin(Const.TF tf, String bCoin, Const.COIN qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2, Const.OHLC ohlc3, Const.OHLC ohlc4) {
+    public ArrayList<Сurrency> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 

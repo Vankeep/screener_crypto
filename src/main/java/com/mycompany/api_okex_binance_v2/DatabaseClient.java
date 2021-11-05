@@ -1,19 +1,32 @@
 package com.mycompany.api_okex_binance_v2;
 
-
-import com.mycompany.api_okex_binance_v2.constants.Const;
+import com.mycompany.api_okex_binance_v2.enums.Coin;
+import com.mycompany.api_okex_binance_v2.enums.Ohlc;
+import com.mycompany.api_okex_binance_v2.enums.Tf;
+import com.mycompany.api_okex_binance_v2.obj.Сurrency;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public interface DatabaseClient {
 
-    public abstract HashMap<Integer,String> getAllPair(Const.COIN qCoin);
+    public HashMap<Integer, String> getAllPair(Coin qCoin);
 
-    public abstract long[] getDataCoin(Const.TF tf, String bCoin, Const.COIN qCoin, Const.OHLC ohlc);
+    /**
+     * Чтение данных из бд
+     *
+     * @param tf нужный таймфрейм
+     * @param candlesBack сколько свечей назад
+     * @param bCoin base currency
+     * @param qCoin qoute currency
+     * @param ohlc open high low close
+     * @return
+     */
+    public ArrayList<Сurrency> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc);
 
-    public abstract long[][] getDataCoin(Const.TF tf, String bCoin, Const.COIN qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2);
+    public ArrayList<Сurrency> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2);
 
-    public abstract long[][] getDataCoin(Const.TF tf, String bCoin, Const.COIN qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2, Const.OHLC ohlc3);
+    public ArrayList<Сurrency> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3);
 
-    public abstract long[][] getDataCoin(Const.TF tf, String bCoin, Const.COIN qCoin, Const.OHLC ohlc1, Const.OHLC ohlc2, Const.OHLC ohlc3, Const.OHLC ohlc4);
+    public ArrayList<Сurrency> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4);
 
 }

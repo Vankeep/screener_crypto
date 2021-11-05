@@ -1,11 +1,11 @@
 package com.mycompany.api_okex_binance_v2.database;
 
-import com.mycompany.api_okex_binance_v2.constants.Const;
+import com.mycompany.api_okex_binance_v2.enums.Coin;
 
 public class GenerateSqlMessage {
 
     /**
-     * Создание таблицы на случай листинга.
+     * Создание таблицы для монеты на случай листинга.
      * <p>
      * Заголовки таблицы: time, open, high, low, close, volume
      * <p>
@@ -30,7 +30,7 @@ public class GenerateSqlMessage {
     }
 
     /**
-     * Удаление таблицы монеты на случай делистинга
+     * Удаление таблицы для монеты на случай делистинга
      *
      * @param bCoin базовая монета
      * @param qCoin монета котировки
@@ -41,7 +41,7 @@ public class GenerateSqlMessage {
     }
 
     /**
-     * Создание таблицы всех монет
+     * Создание списка всех монет к выбранной котировке (USDT, BTC, ETH)
      * <p>
      * Заголовки таблицы: id, nameCoin
      * <p>
@@ -61,7 +61,7 @@ public class GenerateSqlMessage {
     }
 
     /**
-     * Удаление таблицы всех монет
+     * Удаление списка всех монет к выбранной котировке (USDT, BTC, ETH)
      *
      * @param nameTable монета коритовки
      * @return DROP TABLE nameTable
@@ -99,7 +99,7 @@ public class GenerateSqlMessage {
     }
 
     /**
-     * Добавление в таблицу со списом всех пар
+     * Добавление монеты в список всех монет к выбранной котировке (USDT, BTC, ETH)
      *
      * @param nameTable имя таблицы
      * @param bCoin base coin
@@ -121,12 +121,12 @@ public class GenerateSqlMessage {
     }
     
     /**
-     * Получение всей таблицы со списком монет
+     * Получение списка монет к выбранной котировке (USDT, BTC, ETH)
      *
      * @param qCoin quote coin
      * @return SELECT nameCoin FROM qCoin
      */
-    public String readQcoin(Const.COIN qCoin) {
+    public String readQcoin(Coin qCoin) {
         return "SELECT id, nameCoin FROM " + qCoin;
     }
 
