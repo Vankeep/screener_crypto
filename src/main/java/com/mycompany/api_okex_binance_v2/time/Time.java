@@ -1,18 +1,22 @@
 package com.mycompany.api_okex_binance_v2.time;
 
 import com.mycompany.api_okex_binance_v2.enums.Tf;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
+import java.util.Date;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Time {
     private static final Logger logger = LoggerFactory.getLogger(Time.class.getSimpleName());
+    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
     /**
      * @return 1636059450000 msec
      */
     public static long getUTC() {
         Instant instant = Instant.now();
-        return instant.getEpochSecond() * 1000;
+        return instant.getEpochSecond() * 1000 -(Tf.DAY_ONE.quantityMsec() * 3);
     }
 
     /**
@@ -26,7 +30,7 @@ public class Time {
     public static float getOffset(long timeFromDb, Tf tf) {
         float utc = getUTC();
         float time = timeFromDb;
-        float tframe = tf.getMsec();
+        float tframe = tf.quantityMsec();
         return (utc - time) / tframe;
     }
 
@@ -38,8 +42,8 @@ public class Time {
      */
     public static long getCloseCurrentTime(Tf tf) {
         double utc = Time.getUTC();
-        double one_hour = tf.getMsec();
-        return ((long) (utc / one_hour) + 1) * tf.getMsec();
+        double one_hour = tf.quantityMsec();
+        return ((long) (utc / one_hour) + 1) * tf.quantityMsec();
     }
 
     /**
@@ -49,7 +53,7 @@ public class Time {
      * @return
      */
     public static long getEndTime(Tf tf) {
-        return getCloseCurrentTime(tf) - tf.getMsec();
+        return getCloseCurrentTime(tf) - tf.quantityMsec();
 
     }
 
@@ -64,8 +68,31 @@ public class Time {
         if (candlesBack<1){
             logger.error("Значениие candlesBack в функции getStartTime не может быть нулем! Вернул знчение фукции getEndTime");
             return getEndTime(tf);
+        } 
+        return getEndTime(tf) - (tf.quantityMsec()* candlesBack);
+    }
+    
+    
+    /**
+     * Конвертирование времени (для биржи OKEX)
+     *
+     * @param isoFormat строка вида 2021-10-21T11:00:00.000Z
+     * @return
+     */
+    public static long isoToUnix(String isoFormat) {
+        long unixDataTime = 0;
+        Date date;
+        try {
+            date = sdf.parse(isoFormat);
+            unixDataTime = date.getTime();
+        } catch (ParseException ex) {
+            System.err.println(ex.getMessage());
         }
-        return getEndTime(tf) - (tf.getMsec() * candlesBack);
+        return unixDataTime;
+    }
+
+    public static String unixToIso(long unixFormat) {
+        return sdf.format(new Date(unixFormat));
     }
 
 }

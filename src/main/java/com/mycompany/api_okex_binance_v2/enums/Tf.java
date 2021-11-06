@@ -9,7 +9,7 @@ public enum Tf {
         this.msec = msec;
     }
 
-    public long getMsec() {
+    public long quantityMsec() {
         return msec;
     }
 }

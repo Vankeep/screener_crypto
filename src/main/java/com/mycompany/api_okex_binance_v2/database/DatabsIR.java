@@ -13,10 +13,10 @@ import org.slf4j.LoggerFactory;
 
 public class DatabsIR {
     private static final Logger logger = LoggerFactory.getLogger(DatabsIR.class.getSimpleName());
-    public GenerateSqlMessage sqlMessage = new GenerateSqlMessage();
-    public Connection connection;
-    public Statement statement;
-    public Exchange exchange;
+    GenerateSqlMessage sqlMessage = new GenerateSqlMessage();
+    Connection connection;
+    Statement statement;
+    Exchange exchange;
 
     public DatabsIR(Exchange exchange) {
         this.exchange = exchange;
@@ -51,7 +51,6 @@ public class DatabsIR {
 
     public HashMap<Integer, String> readAllPair(String message) {
         HashMap<Integer, String> map = new HashMap<>();
-        logger.info("Чтение бд");
         try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(message);

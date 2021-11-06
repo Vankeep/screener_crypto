@@ -1,15 +1,17 @@
 package com.mycompany.api_okex_binance_v2.drivers;
 
 import com.google.gson.Gson;
-import com.mycompany.api_okex_binance_v2.enums.Coin;
-import com.mycompany.api_okex_binance_v2.enums.Tf;
+import com.mycompany.api_okex_binance_v2.enums.*;
+import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -17,7 +19,6 @@ import org.slf4j.LoggerFactory;
 public class DriverOkex {
     
     private static final Logger logger = LoggerFactory.getLogger(DriverOkex.class.getSimpleName());
-    private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
 
     /**
      * Биржа OKEX. Конвертирует файл с json в двумерный массив. В каждом
@@ -71,6 +72,20 @@ public class DriverOkex {
         list.add(usdt);
         return list;
     }
+    
+    public static ArrayList<CoinCoin> stringToArray(String json){
+        logger.info("Делаю из строки массив");
+        ArrayList<CoinCoin> array = new ArrayList<>();
+        String[] split = json.replaceAll("]", "").replace("[", "").replace("\"", "").split(",");
+        System.out.println(Arrays.toString(split));
+        int counter = 0;
+        for (int i = 0; i < split.length/6; i++) {
+            array.add(new CoinCoin(split[counter], split[counter+1], 
+                    split[counter + 2], split[counter + 3], split[counter + 4], split[counter + 5]));
+            counter=counter+6;
+        }
+        return array;
+    }
 
     /**
      * Создан для сортировки в методе fileToArrayOKEX
@@ -95,28 +110,7 @@ public class DriverOkex {
 
     }
 
-    /**
-     * Конвертирование времени для биржи OKEX
-     *
-     * @param isoFormat строка вида 2021-10-21T11:00:00.000Z
-     * @return
-     */
-    public static long isoToUnixOKEX(String isoFormat) {
-        long unixDataTime = 0;
-        Date date;
-        try {
-            date = sdf.parse(isoFormat);
-            unixDataTime = date.getTime();
-        } catch (ParseException ex) {
-            System.err.println(ex.getMessage());
-        }
-        return unixDataTime;
-    }
-
-    public static String unixToIsoOKEX(long unixFormat) {
-        return sdf.format(new Date(unixFormat));
-    }
-    
+   
     public static String getTf(Tf tf) {
         switch (tf) {
             case HOUR_ONE:

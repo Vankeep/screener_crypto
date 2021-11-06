@@ -2,7 +2,7 @@ package com.mycompany.api_okex_binance_v2.database;
 
 import com.mycompany.api_okex_binance_v2.DatabaseClient;
 import com.mycompany.api_okex_binance_v2.enums.*;
-import com.mycompany.api_okex_binance_v2.obj.Сurrency;
+import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.slf4j.Logger;
@@ -15,8 +15,11 @@ public class Database extends DatabsIR implements DatabaseClient {
     public Database(Exchange exchange) {
         super(exchange);
     }
+    public boolean insertPairMarketData(){
+        return false;
+    }
 
-    public boolean insertAllPairToDatabase(ArrayList<ArrayList<String>> list) {
+    public boolean insertAllExInfo(ArrayList<ArrayList<String>> list) {
         if (connect() && list != null) {
             for (ArrayList<String> arrayList : list) {
                 logger.info("Запись пар к {}", arrayList.get(0));
@@ -37,6 +40,7 @@ public class Database extends DatabsIR implements DatabaseClient {
 
     @Override
     public HashMap<Integer, String> getAllPair(Coin qCoin) {
+        logger.info("Чтение таблицы {}",qCoin);
         if (connect()) {
             try {
                 HashMap<Integer, String> map = readAllPair(sqlMessage.readQcoin(qCoin));
@@ -52,22 +56,22 @@ public class Database extends DatabsIR implements DatabaseClient {
     }
 
     @Override
-    public ArrayList<Сurrency> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc) {
+    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ArrayList<Сurrency> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2) {
+    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ArrayList<Сurrency> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3) {
+    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ArrayList<Сurrency> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4) {
+    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
