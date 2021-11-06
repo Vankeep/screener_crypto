@@ -3,6 +3,7 @@ package com.mycompany.api_okex_binance_v2.drivers;
 import com.google.gson.Gson;
 import com.mycompany.api_okex_binance_v2.enums.*;
 import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.time.Time;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -77,11 +78,14 @@ public class DriverOkex {
         logger.info("Делаю из строки массив");
         ArrayList<CoinCoin> array = new ArrayList<>();
         String[] split = json.replaceAll("]", "").replace("[", "").replace("\"", "").split(",");
-        System.out.println(Arrays.toString(split));
         int counter = 0;
         for (int i = 0; i < split.length/6; i++) {
-            array.add(new CoinCoin(split[counter], split[counter+1], 
-                    split[counter + 2], split[counter + 3], split[counter + 4], split[counter + 5]));
+            array.add(new CoinCoin(String.valueOf(Time.isoToUnix(split[counter])),//split[counter], //
+                    split[counter+1], 
+                    split[counter + 2], 
+                    split[counter + 3], 
+                    split[counter + 4], 
+                    split[counter + 5]));
             counter=counter+6;
         }
         return array;

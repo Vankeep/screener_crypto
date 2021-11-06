@@ -5,18 +5,26 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class Time {
+
     private static final Logger logger = LoggerFactory.getLogger(Time.class.getSimpleName());
     private static final SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'");
+    
     /**
-     * @return 1636059450000 msec
+     * @return 2021-11-06T21:13:17.000Z
      */
-    public static long getUTC() {
-        Instant instant = Instant.now();
-        return instant.getEpochSecond() * 1000 -(Tf.DAY_ONE.quantityMsec() * 3);
+    public static String getUTCStr() {
+        sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
+        return  sdf.format(GregorianCalendar.getInstance().getTimeInMillis());
+    }
+    
+    public static long getUTCLong(){
+        return isoToUnix(getUTCStr());
     }
 
     /**
@@ -28,7 +36,7 @@ public class Time {
      * @return возвращает количсетво пропущенных свечей
      */
     public static float getOffset(long timeFromDb, Tf tf) {
-        float utc = getUTC();
+        float utc = getUTCLong();
         float time = timeFromDb;
         float tframe = tf.quantityMsec();
         return (utc - time) / tframe;
@@ -41,7 +49,7 @@ public class Time {
      * @return время закрытия актуальной свечи
      */
     public static long getCloseCurrentTime(Tf tf) {
-        double utc = Time.getUTC();
+        double utc = Time.getUTCLong();
         double one_hour = tf.quantityMsec();
         return ((long) (utc / one_hour) + 1) * tf.quantityMsec();
     }
@@ -65,14 +73,13 @@ public class Time {
      * @return
      */
     public static long getStartTime(Tf tf, int candlesBack) {
-        if (candlesBack<1){
+        if (candlesBack < 1) {
             logger.error("Значениие candlesBack в функции getStartTime не может быть нулем! Вернул знчение фукции getEndTime");
             return getEndTime(tf);
-        } 
-        return getEndTime(tf) - (tf.quantityMsec()* candlesBack);
+        }
+        return getEndTime(tf) - (tf.quantityMsec() * candlesBack);
     }
-    
-    
+
     /**
      * Конвертирование времени (для биржи OKEX)
      *
@@ -80,15 +87,14 @@ public class Time {
      * @return
      */
     public static long isoToUnix(String isoFormat) {
-        long unixDataTime = 0;
         Date date;
         try {
             date = sdf.parse(isoFormat);
-            unixDataTime = date.getTime();
+            return date.getTime();
         } catch (ParseException ex) {
             System.err.println(ex.getMessage());
+            return -1;
         }
-        return unixDataTime;
     }
 
     public static String unixToIso(long unixFormat) {

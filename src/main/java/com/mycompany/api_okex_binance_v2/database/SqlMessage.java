@@ -2,7 +2,7 @@ package com.mycompany.api_okex_binance_v2.database;
 
 import com.mycompany.api_okex_binance_v2.enums.Coin;
 
-public class GenerateSqlMessage {
+public class SqlMessage {
 
     /**
      * Создание таблицы для монеты на случай листинга.
@@ -17,7 +17,7 @@ public class GenerateSqlMessage {
      *         high VARCHAR(30), low VARCHAR(30), close VARCHAR(30), volume
      *         VARCHAR(30))
      */
-    public String createTable(String bCoin, String qCoin) {
+    public static String createTable(String bCoin, String qCoin) {
 
         String message = "CREATE TABLE " + bCoin + "_" + qCoin + " ("
                 + " time VARCHAR(30),"
@@ -36,7 +36,7 @@ public class GenerateSqlMessage {
      * @param qCoin монета котировки
      * @return DROP TABLE bCoin_qCoin
      */
-    public String deleteTable(String bCoin, String qCoin) {
+    public static String deleteTable(String bCoin, String qCoin) {
         return "DROP TABLE " + bCoin + "_" + qCoin;
     }
 
@@ -53,7 +53,7 @@ public class GenerateSqlMessage {
      * @param nameTable имя таблицы
      * @return строка
      */
-    public String createTable(String nameTable) {
+    public static String createTable(String nameTable) {
         String message = "CREATE TABLE " + nameTable + " ("
                 + " id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + " nameCoin VARCHAR(10))";
@@ -66,7 +66,7 @@ public class GenerateSqlMessage {
      * @param nameTable монета коритовки
      * @return DROP TABLE nameTable
      */
-    public String deleteTable(String nameTable) {
+    public static String deleteTable(String nameTable) {
         return "DROP TABLE " + nameTable;
     }
 
@@ -85,7 +85,7 @@ public class GenerateSqlMessage {
      * @return INSERT INTO bCoin_qCoin ( time, open, high, low, close, volume)
      *         VALUES ('123', '321', '234', '123', '345', '654') 
      */
-    public String insertBcoin(String bCoin, String qCoin, String time, String open, String high, String low, String close, String volume) {
+    public static String insertBcoin(String bCoin, String qCoin, String time, String open, String high, String low, String close, String volume) {
         String message = "INSERT INTO " + bCoin + "_" + qCoin + " ( time, open, high, low, close, volume)"
                 + " VALUES ( '"
                 + time + "', '"
@@ -105,7 +105,7 @@ public class GenerateSqlMessage {
      * @param bCoin base coin
      * @return INSERT INTO nameTable ( nameCoin ) VALUES ( 'bCoin' )
      */
-    public String insertQcoin(String nameTable, String bCoin) {
+    public static String insertQcoin(String nameTable, String bCoin) {
         return "INSERT INTO " + nameTable + " ( nameCoin ) VALUES ( '" + bCoin + "' )";
     }
 
@@ -116,7 +116,7 @@ public class GenerateSqlMessage {
      * @param qCoin quote coin
      * @return SELECT time, open, high, low, close, volume FROM bCoin_qCoin
      */
-    public String readBcoin(String bCoin, String qCoin) {
+    public static String readBcoin(String bCoin, String qCoin) {
         return "SELECT time, open, high, low, close, volume FROM " + bCoin + "_" + qCoin;
     }
     
@@ -126,8 +126,17 @@ public class GenerateSqlMessage {
      * @param qCoin quote coin
      * @return SELECT nameCoin FROM qCoin
      */
-    public String readQcoin(Coin qCoin) {
+    public static String readQcoin(Coin qCoin) {
         return "SELECT id, nameCoin FROM " + qCoin;
+    }
+    
+    /**
+     * Показать все таблицы в базе данных;
+     * 
+     * @return 
+     */
+    public static String seeAllTable(){
+        return "SELECT name FROM sqlite_master WHERE type = \"table\"";
     }
 
 }

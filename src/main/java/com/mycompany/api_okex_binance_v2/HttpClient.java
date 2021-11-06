@@ -32,22 +32,9 @@ public interface HttpClient {
      * @param bCoin base currency
      * @param qCoin quote currency
      * @param tf need timeframe
-     * @param startTime time to start downloading data
+     * @param candlesBack сколько свечей необходимо
      * @return
      */
-    public boolean updateDataPair(String bCoin, Coin qCoin, Tf tf, int canlestic);
-    
-
-    /**
-     * Метод грузит данные напрямую в БД.
-     *
-     * @param bCoin base currency
-     * @param qCoin quote currency
-     * @param tf need timeframe
-     * @param startTime time to start downloading data
-     * @param endTime opening time of the current candle
-     * @return true if everythink is ok
-     */
-    public boolean updateDataPair(String bCoin, Coin qCoin, Tf tf, long startTime, long endTime);
+    public boolean updateDataPair(String bCoin, Coin qCoin, Tf tf, int candlesBack);
 
 }

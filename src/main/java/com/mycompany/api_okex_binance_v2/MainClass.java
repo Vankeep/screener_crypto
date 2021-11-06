@@ -1,6 +1,7 @@
 package com.mycompany.api_okex_binance_v2;
 
 import com.mycompany.api_okex_binance_v2.database.Database;
+import com.mycompany.api_okex_binance_v2.database.SqlMessage;
 import com.mycompany.api_okex_binance_v2.enums.Coin;
 import com.mycompany.api_okex_binance_v2.enums.Exchange;
 import com.mycompany.api_okex_binance_v2.enums.Tf;
@@ -10,24 +11,25 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class MainClass {
+
     public static final Logger logger = LoggerFactory.getLogger(MainClass.class.getSimpleName());
     boolean updateBinance = false;
     boolean updateOkex = false;
 
     public static void main(String[] args) throws InterruptedException {
         MainClass mainClass = new MainClass();
+        System.out.println(Time.getUTCLong());
+        System.out.println(Time.getUTCStr());
         mainClass.momo();
-            
     }
-        
 
     public void momo() throws InterruptedException {
-        
+
         HttpClient okex = new Connect(Exchange.EX_OKEX);
         HttpClient binance = new Connect(Exchange.EX_BINANCE);
-        DatabaseClient okexdb = new Database(Exchange.EX_OKEX);
-        DatabaseClient binancedb = new Database(Exchange.EX_BINANCE);
-        
+        Database okexdb = new Database(Exchange.EX_OKEX);
+        Database binancedb = new Database(Exchange.EX_BINANCE);
+
         Thread one = new Thread(() -> {
             if (binance.updateAllExInfo()) {
                 updateBinance = true;
@@ -39,6 +41,8 @@ public class MainClass {
                 updateOkex = true;
             }
         });
+
+        okex.updateDataPair("HBAR", Coin.USDT, Tf.HOUR_ONE, 2);
 //        two.start();
 //        one.join();
 //        two.join();
@@ -60,7 +64,10 @@ public class MainClass {
 //        } catch (NullPointerException e) {
 //            logger.error("HashMap пустой. {}",e.getMessage());
 //        }
-        okex.updateDataPair("SOL", Coin.USDT, Tf.HOUR_ONE, 20);
+       // okex.updateDataPair("SOL", Coin.USDT, Tf.HOUR_ONE, 5);
+        //                                                           okex.updateDataPair("XRP", Coin.BTC, Tf.HOUR_ONE,1);
+       // binance.updateDataPair("XRP", Coin.BTC, Tf.HOUR_ONE, 5);
+        
 ////        System.out.println(Time.getUTC());
 //        
 //        TimeZone tz = TimeZone.getDefault();
@@ -74,8 +81,6 @@ public class MainClass {
 //        ZonedDateTime zdt = ZonedDateTime.min;
 //        System.out.println(zdt.getYear());
 
-                
-        
     }
 
 }

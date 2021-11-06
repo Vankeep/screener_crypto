@@ -8,42 +8,42 @@ import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Database extends DatabsIR implements DatabaseClient {
+public class Database extends InsertAndRead implements DatabaseClient {
 
     private static final Logger logger = LoggerFactory.getLogger(Database.class.getSimpleName());
 
     public Database(Exchange exchange) {
         super(exchange);
     }
-    public boolean insertPairMarketData(){
-        return false;
+    
+    @Override
+    public void sendMessage(String message){
+        if(connect()){
+            insert(message);
+            close();
+        }
     }
-
-    public boolean insertAllExInfo(ArrayList<ArrayList<String>> list) {
-        if (connect() && list != null) {
-            for (ArrayList<String> arrayList : list) {
-                logger.info("Запись пар к {}", arrayList.get(0));
-                insert(sqlMessage.deleteTable(arrayList.get(0)));
-                insert(sqlMessage.createTable(arrayList.get(0)));
-                for (int i = 1; i < arrayList.size(); i++) {
-                    insert(sqlMessage.insertQcoin(arrayList.get(0), arrayList.get(i)));
-                }
+    
+    
+    @Override
+    public void createAllTable(Coin qCoin){
+        HashMap<Integer, String> list = getAllPair(qCoin);
+        if(connect()){
+            for (int i = 1; i <= list.size(); i++) {
+                insert(SqlMessage.createTable(list.get(i), qCoin.toString()));
             }
             close();
-            return true;
-        } else {
-            logger.info("Неудачное подключение к бд или ArrayList пустой");
-            return false;
         }
-
+        
     }
-
+    
+    
     @Override
     public HashMap<Integer, String> getAllPair(Coin qCoin) {
         logger.info("Чтение таблицы {}",qCoin);
         if (connect()) {
             try {
-                HashMap<Integer, String> map = readAllPair(sqlMessage.readQcoin(qCoin));
+                HashMap<Integer, String> map = readAllPair(SqlMessage.readQcoin(qCoin));
                 close();
                 return map;
             } catch (NullPointerException ex) {

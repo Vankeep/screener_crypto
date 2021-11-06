@@ -11,14 +11,14 @@ import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DatabsIR {
-    private static final Logger logger = LoggerFactory.getLogger(DatabsIR.class.getSimpleName());
-    GenerateSqlMessage sqlMessage = new GenerateSqlMessage();
+public class InsertAndRead {
+    private static final Logger logger = LoggerFactory.getLogger(InsertAndRead.class.getSimpleName());
+    SqlMessage sqlMessage = new SqlMessage();
     Connection connection;
     Statement statement;
     Exchange exchange;
 
-    public DatabsIR(Exchange exchange) {
+    public InsertAndRead(Exchange exchange) {
         this.exchange = exchange;
     }
 
@@ -39,12 +39,15 @@ public class DatabsIR {
         }
     }
 
-    public void insert(String message) {
+    public boolean insert(String message) {
         try {
             statement = connection.createStatement();
             statement.executeUpdate(message);
+            return true;
         } catch (SQLException ex) {
             logger.error("{}. Сообщение - {}", ex.getMessage(), message);
+            logger.error(String.valueOf(ex.getErrorCode()));
+            return false;
         }
 
     }

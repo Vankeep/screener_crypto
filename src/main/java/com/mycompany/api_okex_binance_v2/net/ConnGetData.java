@@ -4,7 +4,6 @@ import com.mycompany.api_okex_binance_v2.constants.Const;
 import com.mycompany.api_okex_binance_v2.drivers.*;
 import com.mycompany.api_okex_binance_v2.enums.*;
 import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
-import com.mycompany.api_okex_binance_v2.time.Time;
 import java.io.File;
 import java.net.URL;
 import java.util.ArrayList;
@@ -13,7 +12,7 @@ import org.slf4j.LoggerFactory;
 
 public class ConnGetData {
 
-    private static final Logger logger = LoggerFactory.getLogger(Connect.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(ConnGetData.class.getSimpleName());
     private ArrayList<ArrayList<String>> list;
     Exchange ex;
 
@@ -34,12 +33,12 @@ public class ConnGetData {
      */
     public ArrayList<ArrayList<String>> getAllExInfo() {
         logger.info("Загружаю все пары в файл {}.bin", ex.getName());
-        
+
         URL url = new GenerateUrl(ex).urlAllExchangeInfo();
         String nameFile = Const.PATH_DATABASE() + ex.getName() + ".bin";
-        
+
         File file = Json.getJsonFile(url, nameFile);
-        
+
         switch (ex) {
             case EX_BINANCE:
                 return DriverBinance.fileToArrayBINANCE(file);
@@ -54,24 +53,35 @@ public class ConnGetData {
 
     /**
      *
-     * 
+     *
      *
      * @param bCoin base currency
      * @param qCoin quote currency
      * @param tf need timeframe
+     * @param candlesBack свечей назад
      * @return true if evrethink is ok
      */
-    public ArrayList<CoinCoin> getDataPair(String bCoin, Coin qCoin, Tf tf, long startTime, long endTime, int sorry) {
-        logger.info("Загрузка данных по паре {}-{}", bCoin, qCoin);
+    public ArrayList<CoinCoin> getDataPair(String bCoin, Coin qCoin, Tf tf, int candlesBack) {
+        logger.info("Загрузка данных с {} по паре {}-{}", ex.getName(), bCoin, qCoin);
         switch (ex) {
             case EX_BINANCE:
-                URL url = new GenerateUrl(ex).urlPairMarketData(bCoin, qCoin, tf, startTime, Time.getEndTime(tf), sorry);
+                URL url = new GenerateUrl(ex).urlPairMarketData(bCoin, qCoin, tf, candlesBack);
+                logger.info(url.toString());
                 String json = Json.getJsonString(url);
-                return DriverBinance.stringToArray(json);
+                if (json != null) {
+                    return DriverBinance.stringToArray(json);
+                } else {
+                    return null;
+                }
             case EX_OKEX:
-                URL url2 = new GenerateUrl(ex).urlPairMarketData(bCoin, qCoin, tf, startTime, Time.getEndTime(tf), sorry);
+                URL url2 = new GenerateUrl(ex).urlPairMarketData(bCoin, qCoin, tf, candlesBack);
+                logger.info(url2.toString());
                 String json2 = Json.getJsonString(url2);
-                return DriverOkex.stringToArray(json2);
+                if (json2 != null) {
+                    return DriverOkex.stringToArray(json2);
+                } else {
+                    return null;
+                }
             default:
                 logger.error("getCoinData выкинула null");
                 return null;

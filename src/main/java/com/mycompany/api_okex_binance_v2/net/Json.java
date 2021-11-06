@@ -31,7 +31,8 @@ public class Json {
             }
             isr.close();
         } catch (IOException ex) {
-            logger.error("Ошибка соединения. Метод getCoinData. {}", ex.getMessage());
+            logger.error("Ошибка соединения! Возвращаю null. Метод getJsonString. {}", ex.getMessage());
+            return null;
         }
         return sb.toString();
     }
@@ -50,7 +51,8 @@ public class Json {
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             fos.close();
         } catch (IOException e) {
-            logger.error("Ошибка соединения. Метод getCoinData. {}", e.getMessage());
+            logger.error("Ошибка соединения! Возвращаю null. Метод getJsonFile. {}", e.getMessage());
+            return null;
         }
         return file;
     }

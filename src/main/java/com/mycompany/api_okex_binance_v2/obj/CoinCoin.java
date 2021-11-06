@@ -18,29 +18,31 @@ public class CoinCoin {
         this.volume = volume;
     }
 
-    public long getTime() {
-        return Long.parseLong(time);
+    public String getTime() {
+        return time;
     }
 
-    public double getOpen() {
-        return Double.parseDouble(open);
+    public String getOpen() {
+        return open;
     }
 
-    public double getHigh() {
-        return Double.parseDouble(high);
+    public String getHigh() {
+        return high;
     }
 
-    public double getLow() {
-        return Double.parseDouble(low);
+    public String getLow() {
+        return low;
     }
 
-    public double getClose() {
-        return Double.parseDouble(close);
+    public String getClose() {
+        return close;
     }
 
-    public double getVolume() {
-        return Double.parseDouble(volume);
+    public String getVolume() {
+        return volume;
     }
+
+    
 
     public void setTime(String time) {
         this.time = time;
@@ -65,7 +67,7 @@ public class CoinCoin {
     public void setVolume(String volume) {
         this.volume = volume;
     }
-
+    
     @Override
     public String toString() {
         return "CoinCoin{" + "time=" + time + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", volume=" + volume + '}';

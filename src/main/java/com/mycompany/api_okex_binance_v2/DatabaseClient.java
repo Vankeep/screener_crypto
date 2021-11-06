@@ -9,6 +9,10 @@ import java.util.HashMap;
 
 public interface DatabaseClient {
 
+    public void sendMessage(String message);
+    
+    public void createAllTable(Coin qCoin);
+
     public HashMap<Integer, String> getAllPair(Coin qCoin);
 
     /**

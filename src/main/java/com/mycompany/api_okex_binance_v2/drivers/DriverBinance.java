@@ -70,10 +70,8 @@ public class DriverBinance {
     
     public static ArrayList<CoinCoin> stringToArray(String json) {
         logger.info("Делаю из строки массив");
-        System.out.println(json);
         ArrayList<CoinCoin> array = new ArrayList<>();
         String[] split = json.replaceAll("]", "").replace("[", "").replace("\"", "").split(",");
-        System.out.println(Arrays.toString(split));
         int counter = 0;
         for (int i = 0; i < split.length / 12; i++) {
             array.add(new CoinCoin(split[counter], split[counter + 1],
