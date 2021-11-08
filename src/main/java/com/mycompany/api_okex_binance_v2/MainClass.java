@@ -2,6 +2,7 @@ package com.mycompany.api_okex_binance_v2;
 
 import com.mycompany.api_okex_binance_v2.database.Database;
 import com.mycompany.api_okex_binance_v2.enums.Exchange;
+import com.mycompany.api_okex_binance_v2.enums.QCoin;
 import com.mycompany.api_okex_binance_v2.net.Connect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +19,7 @@ public class MainClass {
         HttpClient okex = new Connect(Exchange.EX_OKEX);
         DatabaseClient okexDb = new Database(Exchange.EX_OKEX);
         DatabaseClient binDb = new Database(Exchange.EX_BINANCE);
-        
+        okexDb.getLastUpdatePair("XRP", QCoin.USDT);
         //okex.updateAllExInfo();
 //        QCoin[] qCoin = QCoin.getListQCoin();
 //        for (QCoin qCoin1 : qCoin) {
@@ -30,7 +31,7 @@ public class MainClass {
 //            okexDb.createAllTable(qCoin);
 //        }
         //okexDb.cleaningDatabase();
-        binDb.cleaningDatabase();
+        //binDb.cleaningDatabase();
     }
 
     public boolean allExUpdateAllExInfo(HttpClient okex, HttpClient binance) {

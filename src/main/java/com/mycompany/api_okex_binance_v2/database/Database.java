@@ -3,6 +3,7 @@ package com.mycompany.api_okex_binance_v2.database;
 import com.mycompany.api_okex_binance_v2.DatabaseClient;
 import com.mycompany.api_okex_binance_v2.constants.Const;
 import com.mycompany.api_okex_binance_v2.enums.*;
+import com.mycompany.api_okex_binance_v2.net.Connect;
 import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
 import com.mycompany.api_okex_binance_v2.time.Time;
 import java.util.ArrayList;
@@ -65,7 +66,8 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
             close();
         }
         if (lastUpdateIso.equals("")) {
-            logger.error("{} - таблица {} пустая, или ошибка чтения", exchange.getName(), bCoin + "_" + qCoin.toString());
+            logger.error("{} - таблица {}_{} пустая. Пробую скачать последнюю свечу", exchange.getName(), bCoin,qCoin.toString());
+            new Connect(exchange).updateDataPair(bCoin, qCoin, Tf.HOUR_ONE);
             return -1;
         }
         double lastUpdateUnix = Time.isoToUnix(lastUpdateIso);

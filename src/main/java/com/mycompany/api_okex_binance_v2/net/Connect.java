@@ -38,7 +38,8 @@ public class Connect extends ConnectGetData implements HttpClient {
 
     @Override
     public boolean updateDataPair(String bCoin, QCoin qCoin, Tf tf) {
-        return update(getDataPair(bCoin, qCoin, tf, 0), bCoin, qCoin);
+        ArrayList<CoinCoin> list = getDataPair(bCoin, qCoin, tf, 0);
+        return update(list, bCoin, qCoin);
 
     }
 
@@ -48,7 +49,8 @@ public class Connect extends ConnectGetData implements HttpClient {
             logger.info("{} - обновлений не требуется", exchange.getName());
             return false;
         }
-        return update(getDataPair(bCoin, qCoin, tf, candlesBack), bCoin, qCoin);
+        ArrayList<CoinCoin> list = getDataPair(bCoin, qCoin, tf, candlesBack);
+        return update(list, bCoin, qCoin);
     }
     
     private boolean update(ArrayList<CoinCoin> list, String bCoin, QCoin qCoin){
