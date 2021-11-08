@@ -8,11 +8,32 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public interface DatabaseClient {
+    /**
+     * Универсальный метод отправки одного сообщения
+     * @param message 
+     * @return true если все успешно
+     */
+    public boolean sendMessage(String message);
+    /**
+     * Создать все таблицы к указанной монете котировки
+     * @param qCoin  монета котировки
+     * @return true если все успешно
+     */
+    public boolean createAllTable(Coin qCoin);
+    /**
+     * Удалить все таблицы к указанной монете котировки
+     * @param qCoin монета котировки
+     * @return true если все успешно
+     */
+    public boolean deleteAllTable(Coin qCoin);
 
-    public void sendMessage(String message);
-    
-    public void createAllTable(Coin qCoin);
-
+    /**
+     * Получить из базы данных все пары переданной в парамерты функции монеты
+     * котировки. Отсчет индексов в HashMap начинается с 1
+     *
+     * @param qCoin монета котировки
+     * @return HashMap
+     */
     public HashMap<Integer, String> getAllPair(Coin qCoin);
 
     /**
@@ -32,5 +53,23 @@ public interface DatabaseClient {
     public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3);
 
     public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4);
+
+    /**
+     * Запись принятых всех пар биржи в БД
+     *
+     * @param list массив всех пар
+     * @return true если все успешно
+     */
+    public boolean insertAllExInfo(ArrayList<ArrayList<String>> list);
+
+    /**
+     * Запись принятых данных по паре в БД
+     *
+     * @param list данные по паре
+     * @param bCoin базовая монета
+     * @param qCoin монета котировки
+     * @return true если все успешно
+     */
+    public boolean insertDataPair(ArrayList<CoinCoin> list, String bCoin, Coin qCoin);
 
 }

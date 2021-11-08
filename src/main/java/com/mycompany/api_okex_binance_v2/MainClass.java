@@ -1,12 +1,7 @@
 package com.mycompany.api_okex_binance_v2;
 
-import com.mycompany.api_okex_binance_v2.database.Database;
-import com.mycompany.api_okex_binance_v2.database.SqlMessage;
-import com.mycompany.api_okex_binance_v2.enums.Coin;
 import com.mycompany.api_okex_binance_v2.enums.Exchange;
-import com.mycompany.api_okex_binance_v2.enums.Tf;
 import com.mycompany.api_okex_binance_v2.net.Connect;
-import com.mycompany.api_okex_binance_v2.time.Time;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,69 +13,42 @@ public class MainClass {
 
     public static void main(String[] args) throws InterruptedException {
         MainClass mainClass = new MainClass();
-        System.out.println(Time.getUTCLong());
-        System.out.println(Time.getUTCStr());
-        mainClass.momo();
+        HttpClient binance = new Connect(Exchange.EX_BINANCE);
+        HttpClient okex = new Connect(Exchange.EX_OKEX);
+        mainClass.allExUpdateAllExInfo(okex, binance);
+
     }
 
-    public void momo() throws InterruptedException {
-
-        HttpClient okex = new Connect(Exchange.EX_OKEX);
-        HttpClient binance = new Connect(Exchange.EX_BINANCE);
-        Database okexdb = new Database(Exchange.EX_OKEX);
-        Database binancedb = new Database(Exchange.EX_BINANCE);
-
-        Thread one = new Thread(() -> {
+    public boolean allExUpdateAllExInfo(HttpClient okex, HttpClient binance) {
+        Thread binanceThread = new Thread(() -> {
             if (binance.updateAllExInfo()) {
-                updateBinance = true;
+                logger.error("Ошибка обновления, поток binanceThread");
+                updateBinance = false;
+            }
+
+        });
+        binanceThread.start();
+        Thread okeThread = new Thread(() -> {
+            if (!okex.updateAllExInfo()) {
+                logger.error("Ошибка обновления, поток okeThread");
+                updateBinance = false;
             }
         });
-//       one.start();
-        Thread two = new Thread(() -> {
-            if (okex.updateAllExInfo()) {
-                updateOkex = true;
-            }
-        });
-
-        okex.updateDataPair("HBAR", Coin.USDT, Tf.HOUR_ONE, 2);
-//        two.start();
-//        one.join();
-//        two.join();
-//        if (updateBinance && updateOkex) {
-//            System.out.println("Данные успешно обновлены");
-//        }
-//        
-//        HashMap<Integer, String> btc_o = okexdb.getAllPair(Coin.BTC);
-//        HashMap<Integer, String> eth_o = okexdb.getAllPair(Coin.ETH);
-//        HashMap<Integer, String> usdt_o = okexdb.getAllPair(Coin.USDT);
-//        HashMap<Integer, String> btc_b = binancedb.getAllPair(Coin.BTC);
-//        HashMap<Integer, String> eth_b = binancedb.getAllPair(Coin.ETH);
-//        HashMap<Integer, String> usdt_b = binancedb.getAllPair(Coin.USDT);
-//        try {
-//            System.out.println("\nПАРЫ ОКЕХ");
-//            System.out.println(btc_o.toString()+"\n"+eth_o.toString() + "\n"+usdt_o.toString() + "\n");           
-//            System.out.println("\nПАРЫ BINANCE");
-//            System.out.println(btc_b.toString()+"\n"+eth_b.toString() + "\n"+usdt_b.toString() + "\n");           
-//        } catch (NullPointerException e) {
-//            logger.error("HashMap пустой. {}",e.getMessage());
-//        }
-       // okex.updateDataPair("SOL", Coin.USDT, Tf.HOUR_ONE, 5);
-        //                                                           okex.updateDataPair("XRP", Coin.BTC, Tf.HOUR_ONE,1);
-       // binance.updateDataPair("XRP", Coin.BTC, Tf.HOUR_ONE, 5);
-        
-////        System.out.println(Time.getUTC());
-//        
-//        TimeZone tz = TimeZone.getDefault();
-//        System.out.println(tz.toZoneId().getRules().getStandardOffset(Instant.now()).getId());
-////        int offset  = ZonedDateTime.now().getOffset().getTotalSeconds();
-////        System.out.println(Time.getUTC()-offset*1000);
-//        OffsetDateTime utc = OffsetDateTime.now(ZoneOffset.UTC);
-//        long epochMillis = utc.toInstant().getEpochSecond()*1000;
-//        System.out.println(Time.unixToIso(epochMillis));
-//        
-//        ZonedDateTime zdt = ZonedDateTime.min;
-//        System.out.println(zdt.getYear());
-
+        okeThread.start();
+        try {
+            binanceThread.join();
+            okeThread.join();
+        } catch (InterruptedException ex) {
+            logger.error("Ошибка с потоками, метод allExUpdateAllExInfo");
+            return false;
+        }
+        if (!(updateBinance && updateOkex)) {
+            logger.error("Ошибка обновления всех пар, метод allExUpdateAllExInfo");
+            return false;
+        } else {
+            logger.info("Данные успешно обновлены");
+            return true;
+        }
     }
 
 }

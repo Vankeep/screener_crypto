@@ -3,7 +3,6 @@ package com.mycompany.api_okex_binance_v2.time;
 import com.mycompany.api_okex_binance_v2.enums.Tf;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
@@ -18,13 +17,13 @@ public class Time {
     /**
      * @return 2021-11-06T21:13:17.000Z
      */
-    public static String getUTCStr() {
+    public static String getUTCiso() {
         sdf.setTimeZone(TimeZone.getTimeZone("Europe/London"));
         return  sdf.format(GregorianCalendar.getInstance().getTimeInMillis());
     }
     
-    public static long getUTCLong(){
-        return isoToUnix(getUTCStr());
+    public static long getUTCunix(){
+        return isoToUnix(getUTCiso());
     }
 
     /**
@@ -36,7 +35,7 @@ public class Time {
      * @return возвращает количсетво пропущенных свечей
      */
     public static float getOffset(long timeFromDb, Tf tf) {
-        float utc = getUTCLong();
+        float utc = getUTCunix();
         float time = timeFromDb;
         float tframe = tf.quantityMsec();
         return (utc - time) / tframe;
@@ -49,7 +48,7 @@ public class Time {
      * @return время закрытия актуальной свечи
      */
     public static long getCloseCurrentTime(Tf tf) {
-        double utc = Time.getUTCLong();
+        double utc = getUTCunix();
         double one_hour = tf.quantityMsec();
         return ((long) (utc / one_hour) + 1) * tf.quantityMsec();
     }

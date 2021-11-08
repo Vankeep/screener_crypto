@@ -4,7 +4,7 @@ public enum Coin {
 
     BTC("BTC"), ETH("ETH"), USDT("USDT");
 
-    private String name;
+    private final String name;
 
     private Coin(String name) {
         this.name = name;

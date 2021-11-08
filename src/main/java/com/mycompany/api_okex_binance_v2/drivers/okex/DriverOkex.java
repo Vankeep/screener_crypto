@@ -1,34 +1,26 @@
-package com.mycompany.api_okex_binance_v2.drivers;
+package com.mycompany.api_okex_binance_v2.drivers.okex;
 
 import com.google.gson.Gson;
 import com.mycompany.api_okex_binance_v2.enums.*;
+import com.mycompany.api_okex_binance_v2.drivers.Driver;
 import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
-import com.mycompany.api_okex_binance_v2.time.Time;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.StringTokenizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class DriverOkex {
+public class DriverOkex implements Driver{
     
     private static final Logger logger = LoggerFactory.getLogger(DriverOkex.class.getSimpleName());
 
-    /**
-     * Биржа OKEX. Конвертирует файл с json в двумерный массив. В каждом
-     * подмасивве первое число массива это quote_currency этого массива
-     *
-     * @param fail файл с json
-     * @return возвращает двумерный массив
-     */
-    public static ArrayList<ArrayList<String>> fileToArrayOKEX(File fail) {
+
+  
+    @Override
+    public ArrayList<ArrayList<String>> fileToArray(File fail) {
         logger.info("Перетаскиваю даные из okex.bin в массив");
         ArrayList<ArrayList<String>> list = new ArrayList<>();
 
@@ -65,7 +57,7 @@ public class DriverOkex {
                 }
             }
         } catch (IOException ex) {
-            logger.error("Проблемы с файлом binance.bin, return null {}", ex.getMessage());
+            logger.error("Проблемы с файлом okex.bin, return null {}", ex.getMessage());
             return null;
         }
         list.add(btc);
@@ -74,21 +66,42 @@ public class DriverOkex {
         return list;
     }
     
-    public static ArrayList<CoinCoin> stringToArray(String json){
+    @Override
+    public ArrayList<CoinCoin> stringToArray(String json){
         logger.info("Делаю из строки массив");
         ArrayList<CoinCoin> array = new ArrayList<>();
         String[] split = json.replaceAll("]", "").replace("[", "").replace("\"", "").split(",");
-        int counter = 0;
+        int counter = split.length;
         for (int i = 0; i < split.length/6; i++) {
-            array.add(new CoinCoin(String.valueOf(Time.isoToUnix(split[counter])),//split[counter], //
+            counter = counter-6;
+            array.add(new CoinCoin(split[counter], //String.valueOf(Time.isoToUnix(split[counter]))
                     split[counter+1], 
                     split[counter + 2], 
                     split[counter + 3], 
                     split[counter + 4], 
                     split[counter + 5]));
-            counter=counter+6;
         }
         return array;
+    }
+
+    @Override
+    public HttpURLConnection urlAllExchangeInfo() {
+        return DriverURLGeneratorOkex.urlAllExchangeInfo();
+    }
+
+    @Override
+    public HttpURLConnection urlPairMarketData(String bCoin, Coin qCoin, Tf tF, int candlesBack) {
+        return DriverURLGeneratorOkex.urlPairMarketData(bCoin, qCoin, tF, candlesBack);
+    }
+
+    @Override
+    public boolean checkResponseCode(int code) {
+        return DriverResponseCodeOkex.check(code);
+    }
+
+    @Override
+    public String getExchangeName() {
+        return Exchange.EX_OKEX.getName();
     }
 
     /**
@@ -115,26 +128,6 @@ public class DriverOkex {
     }
 
    
-    public static String getTf(Tf tf) {
-        switch (tf) {
-            case HOUR_ONE:
-                return "3600";
-            case HOUR_TWO:
-                return "7200";
-            case HOUR_FOUR:
-                return "14400";
-            case HOUR_SIX:
-                return "21600";
-            case HOUR_TWENTY:
-                return "43200";
-            case DAY_ONE:
-                return "86400";
-            default:
-                return null;
-        }
-    }
     
-    public static String getUrl(){
-        return "https://www.okex.com/";
-    }
+    
 }

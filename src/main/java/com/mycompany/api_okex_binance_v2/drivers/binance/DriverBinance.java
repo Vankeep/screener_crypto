@@ -1,22 +1,25 @@
-package com.mycompany.api_okex_binance_v2.drivers;
+package com.mycompany.api_okex_binance_v2.drivers.binance;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import com.mycompany.api_okex_binance_v2.enums.Coin;
+import com.mycompany.api_okex_binance_v2.drivers.Driver;
+import com.mycompany.api_okex_binance_v2.enums.Exchange;
 import com.mycompany.api_okex_binance_v2.enums.Tf;
 import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.time.Time;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DriverBinance {
+public class DriverBinance implements Driver{
 
     private static final Logger logger = LoggerFactory.getLogger(DriverBinance.class.getSimpleName());
     /**
@@ -26,7 +29,9 @@ public class DriverBinance {
      * @param fail файл с json
      * @return возвращает двумерный массив
      */
-    public static ArrayList<ArrayList<String>> fileToArrayBINANCE(File fail) {
+    @Override
+    public ArrayList<ArrayList<String>> fileToArray(File fail) {
+        
         logger.info("Перетаскиваю даные из binance.bin в массив");
         ArrayList<ArrayList<String>> list = new ArrayList<>();
         ArrayList<String> btc = new ArrayList<>();
@@ -68,40 +73,45 @@ public class DriverBinance {
         return list;
     }
     
-    public static ArrayList<CoinCoin> stringToArray(String json) {
+    @Override
+    public ArrayList<CoinCoin> stringToArray(String json) {
         logger.info("Делаю из строки массив");
         ArrayList<CoinCoin> array = new ArrayList<>();
         String[] split = json.replaceAll("]", "").replace("[", "").replace("\"", "").split(",");
+        logger.info("Получен массив {}",Arrays.toString(split));
+        logger.info("Длинна массива {}", split.length);
         int counter = 0;
         for (int i = 0; i < split.length / 12; i++) {
-            array.add(new CoinCoin(split[counter], split[counter + 1],
-                    split[counter + 2], split[counter + 3], split[counter + 4], split[counter + 5]));
+            String convertTime = Time.unixToIso(Long.parseLong(split[counter]));
+            array.add(new CoinCoin(convertTime, 
+                    split[counter + 1],
+                    split[counter + 2], 
+                    split[counter + 3], 
+                    split[counter + 4], 
+                    split[counter + 5]));
             counter = counter + 12;
         }
         return array;
     }
 
-    public static String getTf(Tf tf) {
-        switch (tf) {
-            case HOUR_ONE:
-                return "1h";
-            case HOUR_TWO:
-                return "2h";
-            case HOUR_FOUR:
-                return "4h";
-            case HOUR_SIX:
-                return "6h";
-            case HOUR_TWENTY:
-                return "12h";
-            case DAY_ONE:
-                return "1d";
-            default:
-                return null;
-        }
+    @Override
+    public String getExchangeName() {
+        return Exchange.EX_BINANCE.getName();
     }
 
-    public static String getUrl() {
-        return "https://api.binance.com/";
+    @Override
+    public HttpURLConnection urlAllExchangeInfo() {
+       return DriverURLGeneratorBinance.AllExchangeInfo();
+    }
+
+    @Override
+    public HttpURLConnection urlPairMarketData(String bCoin, Coin qCoin, Tf tF, int candlesBack) {
+        return DriverURLGeneratorBinance.AllExchangeInfo();
+    }
+
+    @Override
+    public boolean checkResponseCode(int code) {
+        return DriverResponseCodeBinance.checkResponseCode(code);
     }
 
 }

@@ -11,14 +11,15 @@ import java.util.HashMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class InsertAndRead {
-    private static final Logger logger = LoggerFactory.getLogger(InsertAndRead.class.getSimpleName());
-    SqlMessage sqlMessage = new SqlMessage();
+public class DBInsertAndRead extends SqlMsg {
+
+    private static final Logger logger = LoggerFactory.getLogger(DBInsertAndRead.class.getSimpleName());
+    SqlMsg sqlMessage = new SqlMsg();
     Connection connection;
     Statement statement;
     Exchange exchange;
 
-    public InsertAndRead(Exchange exchange) {
+    public DBInsertAndRead(Exchange exchange) {
         this.exchange = exchange;
     }
 
@@ -30,8 +31,8 @@ public class InsertAndRead {
     public boolean connect() {
         try {
             Class.forName("org.sqlite.JDBC");
-            connection = DriverManager.getConnection("JDBC:sqlite:" + Const.PATH_DATABASE() + exchange.getName() + ".db");
-            logger.info("База {}.db подключена", exchange.getName());
+            connection = DriverManager.getConnection("JDBC:sqlite:" + Const.PATH_DATABASE + exchange.getName() + ".db");
+            logger.info("{} - база подключена", exchange.getName());
             return true;
         } catch (ClassNotFoundException | SQLException ex) {
             logger.error(ex.getMessage());
@@ -45,14 +46,14 @@ public class InsertAndRead {
             statement.executeUpdate(message);
             return true;
         } catch (SQLException ex) {
-            logger.error("{}. Сообщение - {}", ex.getMessage(), message);
+            logger.error("{} - {}. Сообщение - {}", exchange.getName(), ex.getMessage(), message);
             logger.error(String.valueOf(ex.getErrorCode()));
             return false;
         }
 
     }
 
-    public HashMap<Integer, String> readAllPair(String message) {
+    public HashMap<Integer, String> readAllPairToQcoin(String message) {
         HashMap<Integer, String> map = new HashMap<>();
         try {
             statement = connection.createStatement();
@@ -65,7 +66,7 @@ public class InsertAndRead {
             }
             return map;
         } catch (SQLException ex) {
-            logger.error("{}. Сообщение - {}", ex.getMessage(), message);
+            logger.error("{} - {}. Сообщение - {}", exchange.getName(), ex.getMessage(), message);
             return null;
         }
 
@@ -73,7 +74,7 @@ public class InsertAndRead {
 
     public void close() {
         try {
-            logger.info("База {}.db отключена", exchange.getName());
+            logger.info("{} - база отключена", exchange.getName());
             connection.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());
