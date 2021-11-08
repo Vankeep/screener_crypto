@@ -31,7 +31,7 @@ public class ConnectJson {
                 sb.append(c);
             }
             isr.close();
-            logger.info("Получена строка {}",sb.toString() );
+            logger.info("Данные успешно получены" );
         } catch (IOException ex) {
             logger.error("Ошибка соединения! Возвращаю null. Метод getJsonString. {}", ex.getMessage());
             return null;

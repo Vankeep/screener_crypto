@@ -1,8 +1,10 @@
 package com.mycompany.api_okex_binance_v2.database;
 
 import com.mycompany.api_okex_binance_v2.DatabaseClient;
+import com.mycompany.api_okex_binance_v2.constants.Const;
 import com.mycompany.api_okex_binance_v2.enums.*;
 import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.time.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
 import org.slf4j.Logger;
@@ -53,6 +55,33 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     }
 
     @Override
+    public int getLastUpdatePair(String bCoin, Coin qCoin) {
+        String lastUpdateIso = "";
+        if (connect()) {
+            lastUpdateIso = readLastUpdate(msgLastUpdate(bCoin + "_" + qCoin));
+            System.out.println(lastUpdateIso);
+            close();
+        }
+        if (lastUpdateIso.equals("")){
+            logger.error("{} - таблица {} пустая", exchange.getName(), bCoin + "_" + qCoin.toString());
+            return -1;
+        }
+        double lastUpdateUnix = Time.isoToUnix(lastUpdateIso);
+        double utcNowUnix = Time.getUTCunix();
+        double offset = utcNowUnix - lastUpdateUnix;
+        double to_hour = offset/Tf.HOUR_ONE.quantityMsec();
+        if (to_hour>1){
+            logger.info("{} - для обновления пары {} нужно {} свечей", exchange.getName(), bCoin + "_" + qCoin.toString(), String.valueOf((int)to_hour));
+            return (int)to_hour-1;
+        } else {
+            logger.info("{} - данные для пары {} актуальны, обновления не требуется", exchange.getName(),bCoin+"_"+qCoin.toString());
+            return -1;
+            
+        }
+
+    }
+
+    @Override
     public HashMap<Integer, String> getAllPair(Coin qCoin) {
         logger.info("{} - чтение таблицы {}", exchange.getName(), qCoin);
         if (connect()) {
@@ -61,7 +90,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
                 close();
                 return map;
             } catch (NullPointerException ex) {
-                logger.error("{} - HashMap пустой. {}",exchange.getName(), ex.getMessage());
+                logger.error("{} - HashMap пустой. {}", exchange.getName(), ex.getMessage());
                 close();
                 return null;
             }
@@ -94,7 +123,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         boolean ok = connect();
         if (ok) {
             for (ArrayList<String> arrayList : list) {
-                logger.info("{} - запись пар к {} в базу даннах",exchange.getName(), arrayList.get(0));
+                logger.info("{} - запись пар к {} в базу даннах", exchange.getName(), arrayList.get(0));
                 insert(msgDeleteTable(arrayList.get(0)));
                 insert(msgCreateTable(arrayList.get(0)));
                 for (int i = 1; i < arrayList.size(); i++) {

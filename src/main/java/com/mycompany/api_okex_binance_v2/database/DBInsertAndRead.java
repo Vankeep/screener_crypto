@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.HashMap;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,7 +53,22 @@ public class DBInsertAndRead extends SqlMsg {
         }
 
     }
-
+    
+    public String readLastUpdate(String message){
+        String time = "";
+        try {
+            statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(message);
+            while (rs.next()) {                
+                time = rs.getString("time");
+            }
+            return time;
+        } catch (SQLException ex) {
+            logger.error("{} - чтение последней записи в таблице не удалось. {}. Сообщение - {}", exchange.getName(), ex.getMessage(), message);
+            return null;
+        }
+    }
+    
     public HashMap<Integer, String> readAllPairToQcoin(String message) {
         HashMap<Integer, String> map = new HashMap<>();
         try {

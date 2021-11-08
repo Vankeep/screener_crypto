@@ -3,6 +3,23 @@ package com.mycompany.api_okex_binance_v2.database;
 import com.mycompany.api_okex_binance_v2.enums.Coin;
 
 public class SqlMsg {
+    
+    class Msg{
+        String message;
+
+        public Msg(String message) {
+            this.message = message;
+        }
+
+        public String getMessage() {
+            return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
+        }
+        
+    }
 
     /**
      * Создание таблицы для монеты на случай листинга.
@@ -69,8 +86,15 @@ public class SqlMsg {
     public String msgDeleteTable(String nameTable) {
         return "DROP TABLE " + nameTable;
     }
+    /**
+     * Последнее обновление в указанной таблице
+     * @param nameTable имя таблицы
+     * @return 
+     */
+    public String msgLastUpdate(String nameTable) {
+        return "SELECT * FROM " + nameTable + " ORDER BY time DESC LIMIT 1";
+    }
 
-    //Данные
     /**
      * Добаление данных в таблицу со значениями
      *
@@ -83,7 +107,7 @@ public class SqlMsg {
      * @param close цена закрытия
      * @param volume обьем
      * @return INSERT INTO bCoin_qCoin ( time, open, high, low, close, volume)
-     *         VALUES ('123', '321', '234', '123', '345', '654') 
+     *         VALUES ('123', '321', '234', '123', '345', '654')
      */
     public String msgInsertBcoin(String bCoin, String qCoin, String time, String open, String high, String low, String close, String volume) {
         String message = "INSERT INTO " + bCoin + "_" + qCoin + " ( time, open, high, low, close, volume)"
@@ -99,7 +123,8 @@ public class SqlMsg {
     }
 
     /**
-     * Добавление монеты в список всех монет к выбранной котировке (USDT, BTC, ETH)
+     * Добавление монеты в список всех монет к выбранной котировке (USDT, BTC,
+     * ETH)
      *
      * @param nameTable имя таблицы
      * @param bCoin base coin
@@ -119,7 +144,7 @@ public class SqlMsg {
     public String msgReadBcoin(String bCoin, String qCoin) {
         return "SELECT time, open, high, low, close, volume FROM " + bCoin + "_" + qCoin;
     }
-    
+
     /**
      * Получение списка монет к выбранной котировке (USDT, BTC, ETH)
      *
@@ -129,13 +154,13 @@ public class SqlMsg {
     public String msgReadQcoin(Coin qCoin) {
         return "SELECT id, nameCoin FROM " + qCoin;
     }
-    
+
     /**
      * Показать все таблицы в базе данных;
-     * 
-     * @return 
+     *
+     * @return
      */
-    public String msgSeeAllTable(){
+    public String msgSeeAllTable() {
         return "SELECT name FROM sqlite_master WHERE type = \"table\"";
     }
 

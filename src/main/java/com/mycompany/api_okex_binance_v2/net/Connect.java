@@ -45,7 +45,7 @@ public class Connect extends ConnectGetData implements HttpClient {
     @Override
     public boolean updateDataPair(String bCoin, Coin qCoin, Tf tf, int candlesBack) {
         if(candlesBack<0){
-            logger.error("{} - candlesBack не может быть меньше нуля", exchange.getName());
+            logger.info("{} - обновлений не требуется", exchange.getName());
             return false;
         }
         return update(getDataPair(bCoin, qCoin, tf, candlesBack), bCoin, qCoin);

@@ -26,6 +26,15 @@ public interface DatabaseClient {
      * @return true если все успешно
      */
     public boolean deleteAllTable(Coin qCoin);
+    
+    /**
+     * Возвращает в часах когда было последниее обновление<p>
+     *-1 данные актуальные, 0 - один час, 1 - два часа, и.т.п.
+     * @param bCoin базовая монета
+     * @param qCoin монета котировки
+     * @return Часы в int
+     */
+    public int getLastUpdatePair(String bCoin, Coin qCoin);
 
     /**
      * Получить из базы данных все пары переданной в парамерты функции монеты

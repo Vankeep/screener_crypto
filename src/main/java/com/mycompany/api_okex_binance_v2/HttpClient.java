@@ -15,8 +15,9 @@ public interface HttpClient {
     public boolean updateAllExInfo();
 
     /**
-     * Метод грузит данные напрямую в БД.<p>
-     * Время не задано, поэтому метод загрузит только последнюю свечу
+     * Метод дописывает в БД указанную пару.<p>
+     * Количество свечей не указано, поэтому метод загрузит только последнюю
+     * свечу
      *
      * @param bCoin base currency
      * @param qCoin quote currency
@@ -26,8 +27,8 @@ public interface HttpClient {
     public boolean updateDataPair(String bCoin, Coin qCoin, Tf tf);
 
     /**
-     * Метод грузит данные напрямую в БД.<p>
-     * endTime будет атоматически выбран с последней свечи.
+     * Метод дописывает в БД указанную пару на указаном временном промежутке
+     * времени.
      *
      * @param bCoin base currency
      * @param qCoin quote currency

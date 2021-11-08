@@ -22,13 +22,7 @@ import org.slf4j.LoggerFactory;
 public class DriverBinance implements Driver{
 
     private static final Logger logger = LoggerFactory.getLogger(DriverBinance.class.getSimpleName());
-    /**
-     * Биржа BINANCE. Конвертирует файл с json в двумерный массив. В каждом
-     * подмасивве первое число массива это quote_currency этого массива
-     *
-     * @param fail файл с json
-     * @return возвращает двумерный массив
-     */
+    
     @Override
     public ArrayList<ArrayList<String>> fileToArray(File fail) {
         
