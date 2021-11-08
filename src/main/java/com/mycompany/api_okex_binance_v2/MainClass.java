@@ -1,9 +1,7 @@
 package com.mycompany.api_okex_binance_v2;
 
 import com.mycompany.api_okex_binance_v2.database.Database;
-import com.mycompany.api_okex_binance_v2.enums.Coin;
 import com.mycompany.api_okex_binance_v2.enums.Exchange;
-import com.mycompany.api_okex_binance_v2.enums.Tf;
 import com.mycompany.api_okex_binance_v2.net.Connect;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,9 +17,20 @@ public class MainClass {
         HttpClient binance = new Connect(Exchange.EX_BINANCE);
         HttpClient okex = new Connect(Exchange.EX_OKEX);
         DatabaseClient okexDb = new Database(Exchange.EX_OKEX);
-//        okex.updateDataPair("UNI", Coin.BTC, Tf.HOUR_ONE, 20);
-        int hh = okexDb.getLastUpdatePair("UNI", Coin.BTC);
-        okex.updateDataPair("UNI", Coin.BTC, Tf.HOUR_ONE, hh);
+        DatabaseClient binDb = new Database(Exchange.EX_BINANCE);
+        
+        //okex.updateAllExInfo();
+//        QCoin[] qCoin = QCoin.getListQCoin();
+//        for (QCoin qCoin1 : qCoin) {
+//            okexDb.createAllTable(qCoin1);
+//        }
+        
+//        QCoin[] listQcoin = QCoin.getListQCoin();
+//        for (QCoin qCoin : listQcoin) {
+//            okexDb.createAllTable(qCoin);
+//        }
+        //okexDb.cleaningDatabase();
+        binDb.cleaningDatabase();
     }
 
     public boolean allExUpdateAllExInfo(HttpClient okex, HttpClient binance) {

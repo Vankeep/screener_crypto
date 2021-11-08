@@ -1,6 +1,6 @@
 package com.mycompany.api_okex_binance_v2;
 
-import com.mycompany.api_okex_binance_v2.enums.Coin;
+import com.mycompany.api_okex_binance_v2.enums.QCoin;
 import com.mycompany.api_okex_binance_v2.enums.Tf;
 
 public interface HttpClient {
@@ -24,7 +24,7 @@ public interface HttpClient {
      * @param tf need timeframe
      * @return
      */
-    public boolean updateDataPair(String bCoin, Coin qCoin, Tf tf);
+    public boolean updateDataPair(String bCoin, QCoin qCoin, Tf tf);
 
     /**
      * Метод дописывает в БД указанную пару на указаном временном промежутке
@@ -36,6 +36,6 @@ public interface HttpClient {
      * @param candlesBack сколько свечей необходимо
      * @return
      */
-    public boolean updateDataPair(String bCoin, Coin qCoin, Tf tf, int candlesBack);
+    public boolean updateDataPair(String bCoin, QCoin qCoin, Tf tf, int candlesBack);
 
 }

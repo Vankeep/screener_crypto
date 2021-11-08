@@ -25,13 +25,13 @@ public class DriverOkex implements Driver{
         ArrayList<ArrayList<String>> list = new ArrayList<>();
 
         ArrayList<String> btc = new ArrayList<>();
-        btc.add(Coin.BTC.toString());
+        btc.add(QCoin.BTC.toString());
 
         ArrayList<String> eth = new ArrayList<>();
-        eth.add(Coin.ETH.toString());
+        eth.add(QCoin.ETH.toString());
 
         ArrayList<String> usdt = new ArrayList<>();
-        usdt.add(Coin.USDT.toString());
+        usdt.add(QCoin.USDT.toString());
 
         StringBuilder sb = new StringBuilder();
         FileInputStream fis;
@@ -46,13 +46,13 @@ public class DriverOkex implements Driver{
             Gson gson = new Gson();
             CoinOKEX[] pair = gson.fromJson(sb.toString(), CoinOKEX[].class);
             for (CoinOKEX cokex : pair) {
-                if (cokex.getQuote_currency().equals(Coin.BTC.toString())) {
+                if (cokex.getQuote_currency().equals(QCoin.BTC.toString())) {
                     btc.add(cokex.getBase_currency());
                 }
-                if (cokex.getQuote_currency().equals(Coin.ETH.toString())) {
+                if (cokex.getQuote_currency().equals(QCoin.ETH.toString())) {
                     eth.add(cokex.getBase_currency());
                 }
-                if (cokex.getQuote_currency().equals(Coin.USDT.toString())) {
+                if (cokex.getQuote_currency().equals(QCoin.USDT.toString())) {
                     usdt.add(cokex.getBase_currency());
                 }
             }
@@ -90,7 +90,7 @@ public class DriverOkex implements Driver{
     }
 
     @Override
-    public HttpURLConnection urlPairMarketData(String bCoin, Coin qCoin, Tf tF, int candlesBack) {
+    public HttpURLConnection urlPairMarketData(String bCoin, QCoin qCoin, Tf tF, int candlesBack) {
         return DriverURLGeneratorOkex.urlPairMarketData(bCoin, qCoin, tF, candlesBack);
     }
 

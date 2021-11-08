@@ -1,6 +1,6 @@
 package com.mycompany.api_okex_binance_v2.drivers.binance;
 
-import com.mycompany.api_okex_binance_v2.enums.Coin;
+import com.mycompany.api_okex_binance_v2.enums.QCoin;
 import com.mycompany.api_okex_binance_v2.enums.Tf;
 import java.io.IOException;
 import java.net.HttpURLConnection;
@@ -22,7 +22,7 @@ public class DriverURLGeneratorBinance {
         }
     }
 
-    public static HttpURLConnection PairMarketData(String bCoin, Coin qCoin, Tf tF, int candlesBack) {
+    public static HttpURLConnection PairMarketData(String bCoin, QCoin qCoin, Tf tF, int candlesBack) {
         URL url;
         try {
             url = new URL("https://api.binance.com/api/v3/klines?symbol=" + bCoin + qCoin.name()

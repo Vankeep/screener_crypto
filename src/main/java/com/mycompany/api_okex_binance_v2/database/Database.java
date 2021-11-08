@@ -7,6 +7,9 @@ import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
 import com.mycompany.api_okex_binance_v2.time.Time;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +32,9 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     }
 
     @Override
-    public boolean createAllTable(Coin qCoin) {
+    public boolean createAllTable(QCoin qCoin) {
         boolean ok = false;
-        HashMap<Integer, String> list = getAllPair(qCoin);
+        Map<Integer, String> list = getAllPair(qCoin);
         if (connect()) {
             for (int i = 1; i <= list.size(); i++) {
                 ok = insert(msgCreateTable(list.get(i), qCoin.toString()));
@@ -42,9 +45,9 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     }
 
     @Override
-    public boolean deleteAllTable(Coin qCoin) {
+    public boolean deleteAllTable(QCoin qCoin) {
         boolean ok = false;
-        HashMap<Integer, String> list = getAllPair(qCoin);
+        Map<Integer, String> list = getAllPair(qCoin);
         if (connect()) {
             for (int i = 0; i < list.size(); i++) {
                 ok = insert(msgDeleteTable(list.get(i), qCoin.toString()));
@@ -55,38 +58,101 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     }
 
     @Override
-    public int getLastUpdatePair(String bCoin, Coin qCoin) {
+    public int getLastUpdatePair(String bCoin, QCoin qCoin) {
         String lastUpdateIso = "";
         if (connect()) {
-            lastUpdateIso = readLastUpdate(msgLastUpdate(bCoin + "_" + qCoin));
-            System.out.println(lastUpdateIso);
+            lastUpdateIso = readLastUpdatePair(msgLastUpdatePair(bCoin + "_" + qCoin));
             close();
         }
-        if (lastUpdateIso.equals("")){
-            logger.error("{} - таблица {} пустая", exchange.getName(), bCoin + "_" + qCoin.toString());
+        if (lastUpdateIso.equals("")) {
+            logger.error("{} - таблица {} пустая, или ошибка чтения", exchange.getName(), bCoin + "_" + qCoin.toString());
             return -1;
         }
         double lastUpdateUnix = Time.isoToUnix(lastUpdateIso);
         double utcNowUnix = Time.getUTCunix();
         double offset = utcNowUnix - lastUpdateUnix;
-        double to_hour = offset/Tf.HOUR_ONE.quantityMsec();
-        if (to_hour>1){
-            logger.info("{} - для обновления пары {} нужно {} свечей", exchange.getName(), bCoin + "_" + qCoin.toString(), String.valueOf((int)to_hour));
-            return (int)to_hour-1;
+        double to_hour = offset / Tf.HOUR_ONE.quantityMsec();
+        if (to_hour > 1) {
+            logger.info("{} - для обновления пары {}_{} нужно {} свечей", exchange.getName(), bCoin, qCoin.toString(), String.valueOf((int) to_hour));
+            return (int) to_hour - 1;
+        } else if (to_hour > 200) {
+            logger.info("{} - {}_{} промежуток более 200 свечей, будет обновлено 200 свечей", exchange.getName(), bCoin, qCoin.toString());
+            return 200;
         } else {
-            logger.info("{} - данные для пары {} актуальны, обновления не требуется", exchange.getName(),bCoin+"_"+qCoin.toString());
+            logger.info("{} - данные для пары {} актуальны, обновления не требуется", exchange.getName(), bCoin + "_" + qCoin.toString());
             return -1;
-            
         }
 
     }
 
     @Override
-    public HashMap<Integer, String> getAllPair(Coin qCoin) {
+    public boolean cleaningDatabase() {
+        Map<Integer, String> listAllTable = null;
+        HashSet<String> listAllPair = new HashSet<>();
+        QCoin[] listAllQcoin = QCoin.getListQCoin();
+        //Получаем все таблицы
+        if (connect()) {
+            listAllTable = readAllNameTablePair(msgSeeAllTable());
+            close();
+            if (listAllTable == null) {
+                logger.error("{} - лист со всеми таблицами = null", exchange.getName());
+                return false;
+            }
+        }
+        //Получаем все пары из базы 
+        int counter = 1;
+        for (QCoin qCoin : listAllQcoin) {
+            Map<Integer, String> list = getAllPair(qCoin);
+            for (int i = 1; i <=list.size(); i++) {
+                listAllPair.add(list.get(i) + "_" + qCoin);
+            }
+        }
+        //Ищем делистинг
+        HashSet<String> delisting = new HashSet<>();
+        boolean findDelist = false;
+        for (Map.Entry<Integer,String> table: listAllTable.entrySet()) {
+            findDelist = false;
+            for (String pair : listAllPair) {
+                if(table.getValue().equals(pair)){
+                    findDelist = true;
+                    break;
+                }
+            }
+            if (!findDelist) delisting.add(table.getValue());
+        }
+        //Ищем листинг
+        boolean findList = false;
+        HashSet<String> listing = new HashSet<>();
+        for (String pair : listAllPair) {
+            findList = false;
+            for (Map.Entry<Integer, String> table : listAllTable.entrySet()) {
+                if (pair.equals(table.getValue())){
+                    findList = true;
+                    break;
+                }
+                
+            }
+            if (!findList) listing.add(pair);
+        }
+        logger.info("Список листинга: {}", listing.toString());
+        //Удаляем делистинг
+        for (QCoin qCoin : listAllQcoin) {
+            delisting.remove(qCoin.toString());
+        }
+        for (String table: delisting){
+            logger.info("Пара {} удалена",table);
+            sendMessage("DROP TABLE " +table);
+        }
+        return true;
+
+    }
+
+    @Override
+    public Map<Integer, String> getAllPair(QCoin qCoin) {
         logger.info("{} - чтение таблицы {}", exchange.getName(), qCoin);
         if (connect()) {
             try {
-                HashMap<Integer, String> map = readAllPairToQcoin(msgReadQcoin(qCoin));
+                Map<Integer, String> map = readAllPair(msgReadQcoin(qCoin));
                 close();
                 return map;
             } catch (NullPointerException ex) {
@@ -99,22 +165,22 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     }
 
     @Override
-    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc) {
+    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, QCoin qCoin, Ohlc ohlc) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2) {
+    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3) {
+    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, Coin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4) {
+    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, String bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -145,7 +211,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     }
 
     @Override
-    public boolean insertDataPair(ArrayList<CoinCoin> list, String bCoin, Coin qCoin) {
+    public boolean insertDataPair(ArrayList<CoinCoin> list, String bCoin, QCoin qCoin) {
         boolean ok = connect();
         if (ok) {
             logger.info("{} - запись пары {}_{}", exchange.getName(), bCoin, qCoin.toString());

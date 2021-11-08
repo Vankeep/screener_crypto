@@ -1,6 +1,6 @@
 package com.mycompany.api_okex_binance_v2.database;
 
-import com.mycompany.api_okex_binance_v2.enums.Coin;
+import com.mycompany.api_okex_binance_v2.enums.QCoin;
 
 public class SqlMsg {
     
@@ -91,7 +91,7 @@ public class SqlMsg {
      * @param nameTable имя таблицы
      * @return 
      */
-    public String msgLastUpdate(String nameTable) {
+    public String msgLastUpdatePair(String nameTable) {
         return "SELECT * FROM " + nameTable + " ORDER BY time DESC LIMIT 1";
     }
 
@@ -151,7 +151,7 @@ public class SqlMsg {
      * @param qCoin quote coin
      * @return SELECT nameCoin FROM qCoin
      */
-    public String msgReadQcoin(Coin qCoin) {
+    public String msgReadQcoin(QCoin qCoin) {
         return "SELECT id, nameCoin FROM " + qCoin;
     }
 

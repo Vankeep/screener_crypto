@@ -1,6 +1,6 @@
 package com.mycompany.api_okex_binance_v2.drivers;
 
-import com.mycompany.api_okex_binance_v2.enums.Coin;
+import com.mycompany.api_okex_binance_v2.enums.QCoin;
 import com.mycompany.api_okex_binance_v2.enums.Tf;
 import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
 import java.io.File;
@@ -42,7 +42,7 @@ public interface Driver {
      * закрытую последнюю свечу
      * @return ссылку обернутую в HttpUrlConnection
      */
-    public HttpURLConnection urlPairMarketData(String bCoin, Coin qCoin, Tf tF, int candlesBack);
+    public HttpURLConnection urlPairMarketData(String bCoin, QCoin qCoin, Tf tF, int candlesBack);
 
     /**
      * Проверяет код ответа сервера для актуальной биржи

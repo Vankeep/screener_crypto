@@ -83,7 +83,7 @@ public class ConnectGetData {
      * @param candlesBack свечей назад
      * @return true if evrethink is ok
      */
-    public ArrayList<CoinCoin> getDataPair(String bCoin, Coin qCoin, Tf tf, int candlesBack) {
+    public ArrayList<CoinCoin> getDataPair(String bCoin, QCoin qCoin, Tf tf, int candlesBack) {
         logger.info("{} - загрузка данных пары {}_{}", exchange.getName(), bCoin, qCoin);
         HttpURLConnection url = driver.urlPairMarketData(bCoin, qCoin, tf, candlesBack);
 
