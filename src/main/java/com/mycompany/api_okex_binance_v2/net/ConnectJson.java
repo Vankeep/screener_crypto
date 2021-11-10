@@ -31,9 +31,8 @@ public class ConnectJson {
                 sb.append(c);
             }
             isr.close();
-            logger.info("Данные успешно получены" );
         } catch (IOException ex) {
-            logger.error("Ошибка соединения! Возвращаю null. Метод getJsonString. {}", ex.getMessage());
+            logger.error("Ошибка соединения! Возвращаю null. Метод getJsonString. {}. {}", url.toString(), ex.getMessage());
             return null;
         }
         return sb.toString();
@@ -53,7 +52,7 @@ public class ConnectJson {
             fos.getChannel().transferFrom(rbc, 0, Long.MAX_VALUE);
             fos.close();
         } catch (IOException e) {
-            logger.error("Ошибка соединения! Возвращаю null. Метод getJsonFile. {}", e.getMessage());
+            logger.error("Ошибка соединения! Возвращаю null. Метод getJsonFile. {}. {}", url.toString(), e.getMessage());
             return null;
         }
         return file;

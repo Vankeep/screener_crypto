@@ -87,14 +87,14 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     @Override
     public boolean cleaningDatabase() {
         //Лист всех таблиц
-        Map<Integer, NameTable> listAllTable = null;
+        Set<NameTable> listAllTable = null;
         //Лист всех пар из таблиц BTC ETH USDT
         Set<NameTable> listAllPair = new HashSet<>();
         QCoin[] allQcoin = QCoin.getListQCoin();
         //Получаем все таблицы
         if (connect()) {
-            logger.info("{} - сканирую все таблицы в БД...");
-            listAllTable = readAllNameTablePair(msgSeeAllTable());
+            logger.info("{} - сканирую все таблицы в БД...", exchange);
+            listAllTable = readAllTableName(msgSeeAllTable());
             close();
             if (listAllTable == null) {
                 logger.error("{} - лист со всеми таблицами = null", exchange);
@@ -105,6 +105,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         int counter = 1;
         for (QCoin qCoin : allQcoin) {
             Map<Integer, BCoin> list = getAllPair(qCoin);
+            logger.info("{}",list);
             for (int i = 1; i <= list.size(); i++) {
                 listAllPair.add(new NameTable(list.get(i), qCoin));
             }
@@ -114,16 +115,16 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         logger.info("{} - ищу делистинги...");
         HashSet<NameTable> delisting = new HashSet<>();
         boolean findDelist = false;
-        for (Map.Entry<Integer, NameTable> table : listAllTable.entrySet()) {
+        for (NameTable table : listAllTable) {
             findDelist = false;
             for (NameTable pair : listAllPair) {
-                if (table.getValue().toString().equals(pair.toString())) {
+                if (table.toString().equals(pair.toString())) {
                     findDelist = true;
                     break;
                 }
             }
             if (!findDelist) {
-                delisting.add(table.getValue());
+                delisting.add(table);
             }
         }
         //Ищем листинг
@@ -132,8 +133,8 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         HashSet<NameTable> listing = new HashSet<>();
         for (NameTable pair : listAllPair) {
             findList = false;
-            for (Map.Entry<Integer, NameTable> table : listAllTable.entrySet()) {
-                if (pair.toString().equals(table.getValue().toString())) {
+            for (NameTable table : listAllTable) {
+                if (pair.toString().equals(table.toString())) {
                     findList = true;
                     break;
                 }
@@ -159,7 +160,6 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
                logger.info("Создана новая таблица {}", table);
            }
         }
-
         delisting.clear();
         listing.clear();
         listAllPair.clear();

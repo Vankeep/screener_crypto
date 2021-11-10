@@ -25,7 +25,7 @@ public class DriverBinance implements Driver{
     @Override
     public HashMap<QCoin,HashSet<BCoin>> fileToArray(File fail) {
         
-        logger.info("Перетаскиваю даные из binance.bin в HashMap");
+        logger.info("EX_BINANCE - Перетаскиваю даные из binance.bin в HashMap");
         HashMap<QCoin, HashSet<BCoin>> list = new HashMap<>();
         QCoin[] qCoins =QCoin.getListQCoin();
         try {
@@ -49,7 +49,7 @@ public class DriverBinance implements Driver{
             }
 
         } catch (FileNotFoundException e) {
-            logger.error("Проблемы с файлом binance.bin, return null ", e.getMessage());
+            logger.error("EX_BINANCE - Проблемы с файлом binance.bin, return null ", e.getMessage());
             return null;
         }
         return list;
@@ -57,7 +57,7 @@ public class DriverBinance implements Driver{
     
     @Override
     public Set<CoinCoin> stringToArray(String json, NameTable nameTable) {
-        logger.info("Делаю из строки массив");
+        logger.info("EX_BINANCE - {} делаю из строки массив", nameTable);
         Set<CoinCoin> set = new HashSet<>();
         String[] split = json.replaceAll("]", "").replace("[", "").replace("\"", "").split(",");
         int counter = 0;

@@ -87,7 +87,7 @@ public class ExchangeApi extends Connect {
         //Цикл загрузки пар
         for (UpdateCoin coin : set) {
             if (coin.getCandlesBack() >= 0) {
-                logger.info("Загружаю {}...", coin.getNameTable());
+                logger.info("{} - загружаю {}...",exchange, coin.getNameTable());
                 Set<CoinCoin> pair = getDataPair(coin.getNameTable().getbCoin(), coin.getNameTable().getqCoin(), tf, coin.getCandlesBack());
                 setPairs.add(pair);
             }
@@ -104,9 +104,7 @@ public class ExchangeApi extends Connect {
             if (counter == cycle) {
                 list.add(System.currentTimeMillis());
                 long timeSleep = list.get(list.size() - 1) - list.get(list.size() - 2);
-                System.out.println("Таймер = " + cycle);
                 if (timeSleep < 3000) {
-                    System.out.println("Сплю " + (3000 - timeSleep) + " миллисекунд...");
                     try {
                         Thread.sleep(3000 - timeSleep);
                     } catch (InterruptedException ex) {
@@ -119,14 +117,14 @@ public class ExchangeApi extends Connect {
         }
         list.clear();
 
-        logger.info("Длинна пришедшего сета {} Длинна полученного сета {} ", set.size(), setPairs.size());
+        logger.info("{} - Длинна пришедшего сета {} Длинна полученного сета {} ",exchange, set.size(), setPairs.size());
         return setPairs;
     }
 
     public boolean insertDataPair(Set<Set<CoinCoin>> pairs) {
         boolean ok = exDatabaseClient.insertDataPair(pairs);
         if (ok) {
-            logger.info("Данные успешно записаны в БД");
+            logger.info("{} - Данные успешно записаны в БД", exchange);
             return true;
         }
         return false;

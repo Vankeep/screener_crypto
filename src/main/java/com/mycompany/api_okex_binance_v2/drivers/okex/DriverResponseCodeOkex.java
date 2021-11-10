@@ -1,6 +1,7 @@
 package com.mycompany.api_okex_binance_v2.drivers.okex;
 
 import com.mycompany.api_okex_binance_v2.constants.Const;
+import com.mycompany.api_okex_binance_v2.enums.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -33,11 +34,11 @@ public class DriverResponseCodeOkex {
 
     enum ResponseMessage {
 
-        OKEX_400("Плохой запрос - Неверный формат запроса"),
-        OKEX_401("Неверный ключ APIKey"),
-        OKEX_403("Запрещено - У вас нет доступа к запрашиваемому ресурсу"),
-        OKEX_404("Не найдено"),
-        OKEX_500("Внутренняя ошибка сервера - У нас возникли проблемы с нашим сервером");
+        OKEX_400("EX_OKEX - КОД 400. Плохой запрос - Неверный формат запроса"),
+        OKEX_401("EX_OKEX - КОД 401. Неверный ключ APIKey"),
+        OKEX_403("EX_OKEX - КОД 403. Запрещено - У вас нет доступа к запрашиваемому ресурсу"),
+        OKEX_404("EX_OKEX - КОД 404. Не найдено"),
+        OKEX_500("EX_OKEX - КОД 500. Внутренняя ошибка сервера - У нас возникли проблемы с нашим сервером");
 
         private String messageError;
 

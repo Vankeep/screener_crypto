@@ -15,5 +15,6 @@ public class Const {
     public static final String PATH_DATABASE = "src" + File.separator + "main" + File.separator + "java"
             + File.separator + "com" + File.separator + "mycompany"
             + File.separator + "api_okex_binance_v2" + File.separator + "database" + File.separator;
+    
 
 }

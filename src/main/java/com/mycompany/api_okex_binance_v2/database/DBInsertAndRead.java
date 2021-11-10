@@ -10,9 +10,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,11 +73,10 @@ public class DBInsertAndRead extends SqlMsg {
         }
     }
 
-    public Map<Integer,NameTable> readAllNameTablePair(String message){
-        Map<Integer, NameTable> list = new HashMap<>();
+    public Set<NameTable> readAllTableName(String message){
+        Set<NameTable> list = new HashSet<>();
         QCoin[] qCoins = QCoin.getListQCoin();
         boolean notEqual = true;
-        String nameTable = "";
             try {
                 statement = connection.createStatement();
                 ResultSet rs = statement.executeQuery(message);
@@ -92,10 +89,11 @@ public class DBInsertAndRead extends SqlMsg {
                         }
                     }
                     if (notEqual){
-                        list.put(counter,new NameTable(name));
+                        list.add(new NameTable(name));
                     }
                     counter++;
                 }
+                System.out.println(list.toString());
                 return list;
             } catch(SQLException ex) {
                 logger.error("{} - чтение всех таблиц не удалось. {}. Сообщение - {}", exchange, ex.getMessage(), message);

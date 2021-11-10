@@ -26,7 +26,7 @@ public class DriverOkex implements Driver{
   
     @Override
     public HashMap<QCoin, HashSet<BCoin>> fileToArray(File fail) {
-        logger.info("Перетаскиваю даные из okex.bin в массив");
+        logger.info("EX_OKEX - Перетаскиваю даные из okex.bin в массив");
         HashMap<QCoin, HashSet<BCoin>> list = new HashMap<>();
         QCoin[] qCoins = QCoin.getListQCoin();
 
@@ -53,7 +53,7 @@ public class DriverOkex implements Driver{
                 list.put(qCoin, set);
             }
         } catch (IOException ex) {
-            logger.error("Проблемы с файлом okex.bin, return null {}", ex.getMessage());
+            logger.error("{} - Проблемы с файлом okex.bin, return null {}",Exchange.EX_OKEX, ex.getMessage());
             return null;
         }
         return list;
@@ -61,7 +61,7 @@ public class DriverOkex implements Driver{
     
     @Override
     public Set<CoinCoin> stringToArray(String json, NameTable nameTable){
-        logger.info("Делаю из строки массив");
+        logger.info("EX_OKEX - {} делаю из строки массив", nameTable);
         Set<CoinCoin> set = new HashSet<>();
         String[] split = json.replaceAll("]", "").replace("[", "").replace("\"", "").split(",");
         int counter = split.length;
