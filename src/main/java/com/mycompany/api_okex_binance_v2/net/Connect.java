@@ -1,71 +1,130 @@
 package com.mycompany.api_okex_binance_v2.net;
 
+import com.mycompany.api_okex_binance_v2.obj.BCoin;
+import com.mycompany.api_okex_binance_v2.interfaces.DatabaseClient;
+import com.mycompany.api_okex_binance_v2.drivers.okex.*;
+import com.mycompany.api_okex_binance_v2.drivers.binance.*;
+import com.mycompany.api_okex_binance_v2.constants.Const;
+import com.mycompany.api_okex_binance_v2.database.Database;
+import com.mycompany.api_okex_binance_v2.drivers.Driver;
+import com.mycompany.api_okex_binance_v2.enums.*;
 import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.obj.NameTable;
+import java.io.File;
+import java.io.IOException;
+import java.net.HttpURLConnection;
 import java.util.ArrayList;
-import com.mycompany.api_okex_binance_v2.HttpClient;
-import com.mycompany.api_okex_binance_v2.enums.QCoin;
-import com.mycompany.api_okex_binance_v2.enums.Exchange;
-import com.mycompany.api_okex_binance_v2.enums.Tf;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Connect extends ConnectGetData implements HttpClient {
+public class Connect {
 
     private static final Logger logger = LoggerFactory.getLogger(Connect.class.getSimpleName());
-    private ArrayList<CoinCoin> list;
     
+    public Driver driver;
+    public Exchange exchange;
+    public DatabaseClient exDatabaseClient;
+
     public Connect(Exchange exchange) {
-        super(exchange);
-    }
-
-    @Override
-    public boolean updateAllExInfo() {
+        if (exchange == Exchange.EX_BINANCE){
+            logger.info("Создаю обьккт DriverBinance");
+            this.driver = new DriverBinance();
+            
+        } else {
+            logger.info("Создаю обьект DriverOkex");
+            this.driver = new DriverOkex();
+        }
         
-        ArrayList<ArrayList<String>> allPair = getAllExInfo();
-        if (allPair != null) {
-            if(dbClient.insertAllExInfo(allPair)){
-                logger.info("{} - данные всех пар в БД успешно обновлены", exchange.getName());
-                return true;
-            }else{
-                logger.error("{} - ошибка записи в бд", exchange.getName());
-                return false;
+        //this.exHttpClient = new Connect(exchange);
+        this.exDatabaseClient = new Database(exchange);
+        this.exchange = exchange;
+    }
+
+    /**
+     * Метод не полиморфен. Первное значение в массиве это quote_coin.
+     * <p>
+     * 1 - > [BTC, GO, BNB, ETH, USDT,....]
+     * <p>
+     * 2 - > [ETH, ALGO, BTC, XRP, SOL,.....]
+     * <p>
+     * 3 - > [USDT, BTC, ETH, BNB, DODO...]
+     *
+     * @return три массива
+     */
+    protected HashMap<QCoin, HashSet<BCoin>> getAllExInfo() {
+        logger.info("{} - загружаю все пары в файл bin", exchange.getName());
+        HttpURLConnection url = driver.urlAllExchangeInfo();
+        logger.info("{} - драйвер создан", driver.getExchangeName());
+        logger.info("{} - ссылка на загрузку пар: {}", exchange.getName(), url.getURL().toString());
+
+        try {
+            if (!checkResponseCode(url.getResponseCode())) {
+                return null;
             }
-        } else{
-            logger.error("{} - массив = null",exchange.getName());
-            return false;
+        } catch (IOException e) {
+            logger.error("{} - ошибка соединения. {}",exchange.getName(), e.getMessage());
+            return null;
         }
-    }
 
-    @Override
-    public boolean updateDataPair(String bCoin, QCoin qCoin, Tf tf) {
-        ArrayList<CoinCoin> list = getDataPair(bCoin, qCoin, tf, 0);
-        return update(list, bCoin, qCoin);
+        String nameFile = Const.PATH_DATABASE + exchange.getName() + ".bin";
+        File file = ConnectJson.getJsonFile(url, nameFile);
+        if (file != null) {
+            return driver.fileToArray(file);
+        } else {
+            logger.error("{} - getAllExInfo вернул null", exchange.getName());
+            return null;
 
-    }
-
-    @Override
-    public boolean updateDataPair(String bCoin, QCoin qCoin, Tf tf, int candlesBack) {
-        if(candlesBack<0){
-            logger.info("{} - обновлений не требуется", exchange.getName());
-            return false;
         }
-        ArrayList<CoinCoin> list = getDataPair(bCoin, qCoin, tf, candlesBack);
-        return update(list, bCoin, qCoin);
+
     }
-    
-    private boolean update(ArrayList<CoinCoin> list, String bCoin, QCoin qCoin){
-        if (list != null) {
-            if(dbClient.insertDataPair(list, bCoin, qCoin)){
-                logger.info("{} - данные всех пары {}_{} в БД успешно скачены и обновлены", exchange.getName(), bCoin, qCoin.toString());
-                return true;
-            } else {
-                logger.error("{} - ошибка записи в бд", exchange.getName());
-                return false;
+
+    /**
+     * Загрузка данных по выбранной паре
+     *
+     * @param bCoin base currency
+     * @param qCoin quote currency
+     * @param tf need timeframe
+     * @param candlesBack свечей назад
+     * @return true if evrethink is ok
+     */
+    protected Set<CoinCoin> getDataPair(BCoin bCoin, QCoin qCoin, Tf tf, int candlesBack) {
+        logger.debug("{} - загрузка данных пары {}_{}", exchange.getName(), bCoin, qCoin);
+        HttpURLConnection url = driver.urlPairMarketData(bCoin, qCoin, tf, candlesBack);
+
+        try {
+            if (!checkResponseCode(url.getResponseCode())) {
+                return null;
             }
-        } else{
-            logger.error("{} - массив данных = null", exchange.getName());
-            return false;
+        } catch (IOException e) {
+            logger.error("{} - ошибка соединения. {}",exchange.getName(), e.getMessage());
+            return null;
         }
+
+        String json = ConnectJson.getJsonString(url);
+        if (json != null) {
+            return driver.stringToArray(json, new NameTable(bCoin,qCoin));
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Проверяет ошибки севера и пишет что за ошибка
+     *
+     * @param code код ошибки
+     * @return
+     */
+    protected boolean checkResponseCode(int code) {
+        if (code == 200) {
+            return true;
+        } else {
+            return driver.checkResponseCode(code);
+
+        }
+
     }
 
 }

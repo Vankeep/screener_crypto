@@ -73,7 +73,7 @@ public class Time {
      */
     public static long getStartTime(Tf tf, int candlesBack) {
         if (candlesBack < 1) {
-            logger.info("Значениие candlesBack в функции {} Отправлено время последней свечи", candlesBack);
+            logger.debug("Значениие candlesBack в функции {} Отправлено время последней свечи", candlesBack);
             return getEndTime(tf);
         }
         return getEndTime(tf) - (tf.quantityMsec() * candlesBack);

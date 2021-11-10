@@ -1,11 +1,16 @@
 package com.mycompany.api_okex_binance_v2.drivers;
 
+import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.enums.QCoin;
 import com.mycompany.api_okex_binance_v2.enums.Tf;
 import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.obj.NameTable;
 import java.io.File;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public interface Driver {
 
@@ -15,15 +20,16 @@ public interface Driver {
      * @param fail файл с данными
      * @return
      */
-    public ArrayList<ArrayList<String>> fileToArray(File fail);
+    public HashMap<QCoin,HashSet<BCoin>> fileToArray(File fail);
 
     /**
-     * Принимает строку с данными по выбранной паре и записывает ее в ArrayList
+     * Принимает строку с данными по выбранной паре и записывает ее в HashSet
      *
      * @param json строка с данными
+     * @param nameTable имя таблицы 
      * @return массив обьктов CoinCoin
      */
-    public ArrayList<CoinCoin> stringToArray(String json);
+    public Set<CoinCoin> stringToArray(String json, NameTable nameTable);
 
     /**
      * Сыылка на все монеты актуальной биржи
@@ -42,7 +48,7 @@ public interface Driver {
      * закрытую последнюю свечу
      * @return ссылку обернутую в HttpUrlConnection
      */
-    public HttpURLConnection urlPairMarketData(String bCoin, QCoin qCoin, Tf tF, int candlesBack);
+    public HttpURLConnection urlPairMarketData(BCoin bCoin, QCoin qCoin, Tf tF, int candlesBack);
 
     /**
      * Проверяет код ответа сервера для актуальной биржи

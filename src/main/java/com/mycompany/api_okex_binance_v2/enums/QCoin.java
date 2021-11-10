@@ -17,4 +17,5 @@ public enum QCoin {
     public static QCoin[] getListQCoin(){
         return new QCoin[]{QCoin.BTC, QCoin.ETH, QCoin.USDT};
     }
+    
 }

@@ -1,14 +1,19 @@
 package com.mycompany.api_okex_binance_v2.drivers.okex;
 
+import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.google.gson.Gson;
 import com.mycompany.api_okex_binance_v2.enums.*;
 import com.mycompany.api_okex_binance_v2.drivers.Driver;
 import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.obj.NameTable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,18 +25,10 @@ public class DriverOkex implements Driver{
 
   
     @Override
-    public ArrayList<ArrayList<String>> fileToArray(File fail) {
+    public HashMap<QCoin, HashSet<BCoin>> fileToArray(File fail) {
         logger.info("Перетаскиваю даные из okex.bin в массив");
-        ArrayList<ArrayList<String>> list = new ArrayList<>();
-
-        ArrayList<String> btc = new ArrayList<>();
-        btc.add(QCoin.BTC.toString());
-
-        ArrayList<String> eth = new ArrayList<>();
-        eth.add(QCoin.ETH.toString());
-
-        ArrayList<String> usdt = new ArrayList<>();
-        usdt.add(QCoin.USDT.toString());
+        HashMap<QCoin, HashSet<BCoin>> list = new HashMap<>();
+        QCoin[] qCoins = QCoin.getListQCoin();
 
         StringBuilder sb = new StringBuilder();
         FileInputStream fis;
@@ -45,43 +42,40 @@ public class DriverOkex implements Driver{
 
             Gson gson = new Gson();
             CoinOKEX[] pair = gson.fromJson(sb.toString(), CoinOKEX[].class);
-            for (CoinOKEX cokex : pair) {
-                if (cokex.getQuote_currency().equals(QCoin.BTC.toString())) {
-                    btc.add(cokex.getBase_currency());
+            for (QCoin qCoin : qCoins) {
+                HashSet<BCoin> set = new HashSet<>();
+                for (CoinOKEX cokex : pair) {
+                    if (cokex.getQuote_currency().equals(qCoin.toString())) {
+                        set.add(new BCoin(cokex.getBase_currency()));
+                    }
+                    
                 }
-                if (cokex.getQuote_currency().equals(QCoin.ETH.toString())) {
-                    eth.add(cokex.getBase_currency());
-                }
-                if (cokex.getQuote_currency().equals(QCoin.USDT.toString())) {
-                    usdt.add(cokex.getBase_currency());
-                }
+                list.put(qCoin, set);
             }
         } catch (IOException ex) {
             logger.error("Проблемы с файлом okex.bin, return null {}", ex.getMessage());
             return null;
         }
-        list.add(btc);
-        list.add(eth);
-        list.add(usdt);
         return list;
     }
     
     @Override
-    public ArrayList<CoinCoin> stringToArray(String json){
+    public Set<CoinCoin> stringToArray(String json, NameTable nameTable){
         logger.info("Делаю из строки массив");
-        ArrayList<CoinCoin> array = new ArrayList<>();
+        Set<CoinCoin> set = new HashSet<>();
         String[] split = json.replaceAll("]", "").replace("[", "").replace("\"", "").split(",");
         int counter = split.length;
         for (int i = 0; i < split.length/6; i++) {
             counter = counter-6;
-            array.add(new CoinCoin(split[counter], //String.valueOf(Time.isoToUnix(split[counter]))
+            set.add(new CoinCoin(split[counter], //String.valueOf(Time.isoToUnix(split[counter]))
                     split[counter+1], 
                     split[counter + 2], 
                     split[counter + 3], 
                     split[counter + 4], 
-                    split[counter + 5]));
+                    split[counter + 5],
+                    nameTable));
         }
-        return array;
+        return set;
     }
 
     @Override
@@ -90,7 +84,7 @@ public class DriverOkex implements Driver{
     }
 
     @Override
-    public HttpURLConnection urlPairMarketData(String bCoin, QCoin qCoin, Tf tF, int candlesBack) {
+    public HttpURLConnection urlPairMarketData(BCoin bCoin, QCoin qCoin, Tf tF, int candlesBack) {
         return DriverURLGeneratorOkex.urlPairMarketData(bCoin, qCoin, tF, candlesBack);
     }
 
@@ -124,7 +118,7 @@ public class DriverOkex implements Driver{
         public String getQuote_currency() {
             return quote_currency;
         }
-
+        
     }
 
    

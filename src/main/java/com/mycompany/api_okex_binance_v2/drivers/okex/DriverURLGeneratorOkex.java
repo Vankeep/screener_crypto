@@ -1,5 +1,6 @@
 package com.mycompany.api_okex_binance_v2.drivers.okex;
 
+import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.enums.QCoin;
 import com.mycompany.api_okex_binance_v2.enums.Tf;
 import com.mycompany.api_okex_binance_v2.time.Time;
@@ -23,9 +24,9 @@ public class DriverURLGeneratorOkex {
         }
     }
 
-    public static HttpURLConnection urlPairMarketData(String bCoin, QCoin qCoin, Tf tF, int candlesBack) {
+    public static HttpURLConnection urlPairMarketData(BCoin bCoin, QCoin qCoin, Tf tF, int candlesBack) {
         try {
-            URL url = new URL("https://www.okex.com/api/spot/v3/instruments/" + bCoin + "-" + qCoin.name()
+            URL url = new URL("https://www.okex.com/api/spot/v3/instruments/" + bCoin + "-" + qCoin
                     + "/candles?granularity=" + getTf(tF)
                     + "&start=" + Time.unixToIso(Time.getStartTime(tF, candlesBack))
                     + "&end=" + Time.getUTCiso());

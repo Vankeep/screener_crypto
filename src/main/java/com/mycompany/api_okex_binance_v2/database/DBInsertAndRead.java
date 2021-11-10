@@ -1,7 +1,10 @@
 package com.mycompany.api_okex_binance_v2.database;
 
 import com.mycompany.api_okex_binance_v2.constants.Const;
+import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.enums.Exchange;
+import com.mycompany.api_okex_binance_v2.enums.QCoin;
+import com.mycompany.api_okex_binance_v2.obj.NameTable;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
@@ -36,7 +39,7 @@ public class DBInsertAndRead extends SqlMsg {
         try {
             Class.forName("org.sqlite.JDBC");
             connection = DriverManager.getConnection("JDBC:sqlite:" + Const.PATH_DATABASE + exchange.getName() + ".db");
-            logger.info("{} - база подключена", exchange.getName());
+            //logger.info("{} - база подключена", exchange.getName());
             return true;
         } catch (ClassNotFoundException | SQLException ex) {
             logger.error("Ошибка подключения к базе данных. {}",ex.getMessage());
@@ -51,7 +54,7 @@ public class DBInsertAndRead extends SqlMsg {
             return true;
             
         } catch (SQLException ex) {
-            logger.error("{} - {}. Код ошибки - {}", exchange.getName(), ex.getMessage(), ex.getErrorCode());
+            logger.error("{} - {}. Код ошибки - {}", exchange, ex.getMessage(), ex.getErrorCode());
             return false;
         }
 
@@ -67,45 +70,55 @@ public class DBInsertAndRead extends SqlMsg {
             }
             return time;
         } catch (SQLException ex) {
-            logger.error("{} - чтение последней записи в таблице не удалось. {}. Сообщение - {} Код ошибки - {}", exchange.getName(), ex.getMessage(), message, ex.getErrorCode());
+            logger.error("{} - чтение последней записи в таблице не удалось. {}. Сообщение - {} Код ошибки - {}", exchange, ex.getMessage(), message, ex.getErrorCode());
             return "";
         }
     }
-    
-    public Map<Integer,String> readAllNameTablePair(String message){
-        Map<Integer, String> list = new HashMap<>();
+
+    public Map<Integer,NameTable> readAllNameTablePair(String message){
+        Map<Integer, NameTable> list = new HashMap<>();
+        QCoin[] qCoins = QCoin.getListQCoin();
+        boolean notEqual = true;
         String nameTable = "";
             try {
                 statement = connection.createStatement();
                 ResultSet rs = statement.executeQuery(message);
                 int counter = 1;
                 while(rs.next()){
-                    list.put(counter,rs.getString("name"));
+                    String name = rs.getString("name");
+                    for (QCoin qCoin : qCoins) {
+                        if(qCoin.toString().equals(name)){
+                            notEqual = false;
+                        }
+                    }
+                    if (notEqual){
+                        list.put(counter,new NameTable(name));
+                    }
                     counter++;
                 }
                 return list;
             } catch(SQLException ex) {
-                logger.error("{} - чтение всех таблиц не удалось. {}. Сообщение - {}", exchange.getName(), ex.getMessage(), message);
+                logger.error("{} - чтение всех таблиц не удалось. {}. Сообщение - {}", exchange, ex.getMessage(), message);
                 return null;
             }
                 //name
                 
      }
     
-    public Map<Integer, String> readAllPair(String message) {
-        Map<Integer, String> map = new HashMap<>();
+    public Map<Integer, BCoin> readAllPair(String message) {
+        Map<Integer, BCoin> map = new HashMap<>();
         try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(message);
 
             while (rs.next()) {
                 int key = rs.getInt("id");
-                String nameCoin = rs.getString("nameCoin");
+                BCoin nameCoin = new BCoin(rs.getString("nameCoin"));
                 map.put(key, nameCoin);
             }
             return map;
         } catch (SQLException ex) {
-            logger.error("{} - {}. Сообщение - {}", exchange.getName(), ex.getMessage(), message);
+            logger.error("{} - {}. Сообщение - {}", exchange, ex.getMessage(), message);
             return null;
         }
 
@@ -113,7 +126,7 @@ public class DBInsertAndRead extends SqlMsg {
 
     public void close() {
         try {
-            logger.info("{} - база отключена", exchange.getName());
+            //logger.info("{} - база отключена", exchange.getName());
             connection.close();
         } catch (SQLException ex) {
             logger.error(ex.getMessage());

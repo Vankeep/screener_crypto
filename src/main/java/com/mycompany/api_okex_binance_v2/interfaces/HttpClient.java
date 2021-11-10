@@ -1,4 +1,4 @@
-package com.mycompany.api_okex_binance_v2;
+package com.mycompany.api_okex_binance_v2.interfaces;
 
 import com.mycompany.api_okex_binance_v2.enums.QCoin;
 import com.mycompany.api_okex_binance_v2.enums.Tf;
@@ -12,6 +12,7 @@ public interface HttpClient {
      *
      * @return true if everythink is ok
      */
+    @Deprecated
     public boolean updateAllExInfo();
 
     /**
@@ -24,6 +25,7 @@ public interface HttpClient {
      * @param tf need timeframe
      * @return
      */
+    @Deprecated
     public boolean updateDataPair(String bCoin, QCoin qCoin, Tf tf);
 
     /**
@@ -36,6 +38,7 @@ public interface HttpClient {
      * @param candlesBack сколько свечей необходимо
      * @return
      */
+    @Deprecated
     public boolean updateDataPair(String bCoin, QCoin qCoin, Tf tf, int candlesBack);
 
 }

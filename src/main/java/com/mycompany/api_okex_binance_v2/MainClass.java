@@ -1,9 +1,20 @@
 package com.mycompany.api_okex_binance_v2;
 
 import com.mycompany.api_okex_binance_v2.database.Database;
+import com.mycompany.api_okex_binance_v2.interfaces.HttpClient;
+
 import com.mycompany.api_okex_binance_v2.enums.Exchange;
 import com.mycompany.api_okex_binance_v2.enums.QCoin;
+import com.mycompany.api_okex_binance_v2.enums.Tf;
+import com.mycompany.api_okex_binance_v2.interfaces.DatabaseClient;
 import com.mycompany.api_okex_binance_v2.net.Connect;
+import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.obj.UpdateCoin;
+import java.util.ArrayList;
+import java.util.Map;
+import java.util.Set;
+import java.util.logging.Level;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,24 +25,25 @@ public class MainClass {
     boolean updateOkex = false;
 
     public static void main(String[] args) throws InterruptedException {
-        MainClass mainClass = new MainClass();
-        HttpClient binance = new Connect(Exchange.EX_BINANCE);
-        HttpClient okex = new Connect(Exchange.EX_OKEX);
-        DatabaseClient okexDb = new Database(Exchange.EX_OKEX);
-        DatabaseClient binDb = new Database(Exchange.EX_BINANCE);
-        okexDb.getLastUpdatePair("XRP", QCoin.USDT);
-        //okex.updateAllExInfo();
-//        QCoin[] qCoin = QCoin.getListQCoin();
-//        for (QCoin qCoin1 : qCoin) {
-//            okexDb.createAllTable(qCoin1);
-//        }
-        
-//        QCoin[] listQcoin = QCoin.getListQCoin();
-//        for (QCoin qCoin : listQcoin) {
-//            okexDb.createAllTable(qCoin);
-//        }
+        test();
+        //Set<UpdateCoin> set = okex.getLastUpdateTime(QCoin.BTC);
+
+//        okex.cleaningDatabase();
         //okexDb.cleaningDatabase();
         //binDb.cleaningDatabase();
+    }
+
+    public static void test() {
+        ExchangeApi okex = new ExchangeApi(Exchange.EX_OKEX);
+        
+        okex.cleaningDatabase();
+        Set<UpdateCoin> set = okex.getLastUpdateTime(QCoin.ETH);
+//
+////        
+        System.out.println(set);
+        Set<Set<CoinCoin>> ss = okex.downloadDatePair(set, Tf.HOUR_ONE);
+        okex.insertDataPair(ss);
+
     }
 
     public boolean allExUpdateAllExInfo(HttpClient okex, HttpClient binance) {
@@ -65,5 +77,47 @@ public class MainClass {
             return true;
         }
     }
+    /*
+     * public void downloadLastUpdate(Exchange exchange, QCoin qCoin){
+     * ExchangeApi okex = new ExchangeApi(exchange);
+     * Set<UpdateCoin> set = okex.getLastUpdateTime(qCoin);
+     * System.out.println(set);
+     * Thread thread = new Thread(() -> {
+     * logger.info("Поток открыт");
+     * int plusplus = 0;
+     * int counter = 20;
+     * ArrayList<Long> list = new ArrayList<>();
+     * list.add(System.currentTimeMillis());
+     * for (UpdateCoin entry : set) {
+     * okex.updateDataPair(entry.getbCoin(), entry.getqCoin(), Tf.HOUR_ONE,
+     * entry.getCandlesBack());
+     * if (plusplus == counter) {
+     * list.add(System.currentTimeMillis());
+     * long timeSleep = list.get(list.size() - 1) - list.get(list.size() - 2);
+     * if (timeSleep < 2000) {
+     * logger.debug("Sleep {} msec...",(2000 - timeSleep));
+     * try {
+     * Thread.sleep(2000 - timeSleep);
+     * } catch (InterruptedException ex) {
+     * ex.printStackTrace();
+     * }
+     * }
+     * counter += 20;
+     * }
+     * plusplus++;
+     * }
+     * logger.info("Затрачено времени {}", (list.get(list.size() - 1) -
+     * list.get(0)) / 1000);
+     * list.clear();
+     * });
+     * thread.start();
+     * try {
+     * thread.join();
+     * } catch (InterruptedException ex) {
+     * java.util.logging.Logger.getLogger(MainClass.class.getName()).log(Level.SEVERE,
+     * null, ex);
+     * }
+     * }
+     */
 
 }

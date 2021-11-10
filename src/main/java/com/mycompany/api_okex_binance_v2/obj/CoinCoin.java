@@ -8,8 +8,19 @@ public class CoinCoin {
     String low;
     String close;
     String volume;
+    NameTable nameTable;
 
     public CoinCoin(String time, String open, String high, String low, String close, String volume) {
+        this.time = time;
+        this.open = open;
+        this.high = high;
+        this.low = low;
+        this.close = close;
+        this.volume = volume;
+    }
+
+    public CoinCoin(String time, String open, String high, String low, String close, String volume, NameTable nameTable) {
+        this.nameTable = nameTable;
         this.time = time;
         this.open = open;
         this.high = high;
@@ -42,7 +53,18 @@ public class CoinCoin {
         return volume;
     }
 
-    
+    @Override
+    public String toString() {
+        return "CoinCoin{" + "time=" + time + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", volume=" + volume + ", nameTable=" + nameTable + '}';
+    }
+
+    public NameTable getNameTable() {
+        return nameTable;
+    }
+
+    public void setNameTable(NameTable nameTable) {
+        this.nameTable = nameTable;
+    }
 
     public void setTime(String time) {
         this.time = time;
@@ -66,11 +88,6 @@ public class CoinCoin {
 
     public void setVolume(String volume) {
         this.volume = volume;
-    }
-    
-    @Override
-    public String toString() {
-        return "CoinCoin{" + "time=" + time + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", volume=" + volume + '}';
     }
 
 }
