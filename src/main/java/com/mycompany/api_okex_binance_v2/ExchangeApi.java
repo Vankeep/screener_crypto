@@ -2,22 +2,46 @@ package com.mycompany.api_okex_binance_v2;
 
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.database.Database;
+import com.mycompany.api_okex_binance_v2.database.Update;
 import com.mycompany.api_okex_binance_v2.enums.*;
 import com.mycompany.api_okex_binance_v2.interfaces.DatabaseClient;
 import com.mycompany.api_okex_binance_v2.net.Connect;
 import com.mycompany.api_okex_binance_v2.obj.*;
+import com.mycompany.api_okex_binance_v2.time.Time;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ExchangeApi extends Connect {
-
+    public GregorianCalendar gc = new GregorianCalendar();
     private static final Logger logger = LoggerFactory.getLogger(ExchangeApi.class.getSimpleName());
 
     public ExchangeApi(Exchange exchange) {
         super(exchange);
     }
-
+    
+    public void run() {
+        gc.setTimeInMillis(Time.getCloseCurrentСandle(Tf.HOUR_ONE) + 5000);
+        Date startDate = gc.getTime();
+        logger.info("Время стрта обновлений {}", startDate);
+        
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+                long sd = System.currentTimeMillis();
+                for (QCoin qCoin : QCoin.getListQCoin()) {
+                    Set<UpdateCoin> set = getLastUpdateTime(qCoin);
+                    Set<Set<DataCoin>> ss = downloadDatePair(set, Tf.HOUR_ONE);
+                    insertDataPair(ss);
+                    
+                }
+                System.out.println(System.currentTimeMillis()-sd);
+            }
+        };
+        Timer timer = new Timer();
+        timer.scheduleAtFixedRate(task, startDate, 3600 * 1000);
+    }
+    
     public boolean updateAllExInfo() {
         HashMap<QCoin,HashSet<BCoin>> allPair = getAllExInfo();
         if (allPair != null) {

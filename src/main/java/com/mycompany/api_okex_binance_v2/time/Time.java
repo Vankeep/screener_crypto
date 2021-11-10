@@ -47,7 +47,7 @@ public class Time {
      * @param tf need timeframe
      * @return время закрытия актуальной свечи
      */
-    public static long getCloseCurrentTime(Tf tf) {
+    public static long getCloseCurrentСandle(Tf tf) {
         double utc = getUTCunix();
         double one_hour = tf.quantityMsec();
         return ((long) (utc / one_hour) + 1) * tf.quantityMsec();
@@ -60,7 +60,7 @@ public class Time {
      * @return
      */
     public static long getEndTime(Tf tf) {
-        return getCloseCurrentTime(tf) - tf.quantityMsec();
+        return getCloseCurrentСandle(tf) - tf.quantityMsec();
 
     }
 
