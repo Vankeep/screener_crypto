@@ -40,7 +40,7 @@ public class DBInsertAndRead extends SqlMsg {
             //logger.info("{} - база подключена", exchange.getName());
             return true;
         } catch (ClassNotFoundException | SQLException ex) {
-            logger.error("Ошибка подключения к базе данных. {}",ex.getMessage());
+            logger.error("Ошибка подключения к базе данных. {}", ex.getMessage());
             return false;
         }
     }
@@ -50,20 +50,20 @@ public class DBInsertAndRead extends SqlMsg {
             statement = connection.createStatement();
             statement.executeUpdate(message);
             return true;
-            
+
         } catch (SQLException ex) {
             logger.error("{} - {}. Код ошибки - {}", exchange, ex.getMessage(), ex.getErrorCode());
             return false;
         }
 
     }
-    
-    public String readLastUpdatePair(String message){
+
+    public String readLastUpdatePair(String message) {
         String time = "";
         try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(message);
-            while (rs.next()) {                
+            while (rs.next()) {
                 time = rs.getString("time");
             }
             return time;
@@ -73,36 +73,34 @@ public class DBInsertAndRead extends SqlMsg {
         }
     }
 
-    public Set<NameTable> readAllTableName(String message){
-        Set<NameTable> list = new HashSet<>();
+    public Set<NameTable> readAllTableName(String message) {
         QCoin[] qCoins = QCoin.getListQCoin();
+        Set<NameTable> list = new HashSet<>();
+        Set<String> deleteList = new HashSet<>();
         boolean notEqual = true;
-            try {
-                statement = connection.createStatement();
-                ResultSet rs = statement.executeQuery(message);
-                int counter = 1;
-                while(rs.next()){
-                    String name = rs.getString("name");
+        try {
+            statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(message);
+            while (rs.next()) {
+                try {
+                    String[] name = rs.getString("name").split("_");
                     for (QCoin qCoin : qCoins) {
-                        if(qCoin.toString().equals(name)){
-                            notEqual = false;
+                        if (qCoin.toString().equals(name[1])) {
+                            list.add(new NameTable(new BCoin(name[0]), qCoin));
                         }
                     }
-                    if (notEqual){
-                        list.add(new NameTable(name));
-                    }
-                    counter++;
+                } catch (ArrayIndexOutOfBoundsException ex) {
+                    
                 }
-                System.out.println(list.toString());
-                return list;
-            } catch(SQLException ex) {
-                logger.error("{} - чтение всех таблиц не удалось. {}. Сообщение - {}", exchange, ex.getMessage(), message);
-                return null;
             }
-                //name
-                
-     }
-    
+            return list;
+        } catch (SQLException ex) {
+            logger.error("{} - чтение всех таблиц не удалось. {}. Сообщение - {}", exchange, ex.getMessage(), message);
+            return null;
+        }
+
+    }
+
     public Map<Integer, BCoin> readAllPair(String message) {
         Map<Integer, BCoin> map = new HashMap<>();
         try {

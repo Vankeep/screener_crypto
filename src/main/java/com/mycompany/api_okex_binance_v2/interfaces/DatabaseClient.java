@@ -2,7 +2,7 @@ package com.mycompany.api_okex_binance_v2.interfaces;
 
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.enums.*;
-import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.obj.DataCoin;
 import java.util.*;
 
 public interface DatabaseClient {
@@ -67,13 +67,13 @@ public interface DatabaseClient {
      * @param ohlc        open high low close
      * @return
      */
-    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc);
+    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc);
 
-    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2);
+    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2);
 
-    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3);
+    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3);
 
-    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4);
+    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4);
 
     /**
      * Запись принятых всех пар биржи в БД
@@ -84,21 +84,11 @@ public interface DatabaseClient {
     public boolean insertAllExInfo(HashMap<QCoin, HashSet<BCoin>> list);
 
     /**
-     * Запись принятых данных по паре в БД
-     *
-     * @param list  данные по паре
-     * @param bCoin базовая монета
-     * @param qCoin монета котировки
-     * @return true если все успешно
-     */
-    @Deprecated
-    public boolean insertDataPair(Set<CoinCoin> list, BCoin bCoin, QCoin qCoin);
-    /**
      * Запись принятых данных по паре в БД. Получить сет в функции 
      *
      * @param pairs двумерный сет с данными по парам
      * @return true если все успешно
      */
-    public boolean insertDataPair(Set<Set<CoinCoin>> pairs);
+    public boolean insertDataPair(Set<Set<DataCoin>> pairs);
 
 }

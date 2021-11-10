@@ -3,7 +3,7 @@ package com.mycompany.api_okex_binance_v2.drivers;
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.enums.QCoin;
 import com.mycompany.api_okex_binance_v2.enums.Tf;
-import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.obj.DataCoin;
 import com.mycompany.api_okex_binance_v2.obj.NameTable;
 import java.io.File;
 import java.net.HttpURLConnection;
@@ -29,7 +29,7 @@ public interface Driver {
      * @param nameTable имя таблицы 
      * @return массив обьктов CoinCoin
      */
-    public Set<CoinCoin> stringToArray(String json, NameTable nameTable);
+    public Set<DataCoin> stringToArray(String json, NameTable nameTable);
 
     /**
      * Сыылка на все монеты актуальной биржи

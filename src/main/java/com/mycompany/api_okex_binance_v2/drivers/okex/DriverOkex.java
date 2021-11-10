@@ -4,7 +4,7 @@ import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.google.gson.Gson;
 import com.mycompany.api_okex_binance_v2.enums.*;
 import com.mycompany.api_okex_binance_v2.drivers.Driver;
-import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.obj.DataCoin;
 import com.mycompany.api_okex_binance_v2.obj.NameTable;
 import java.io.File;
 import java.io.FileInputStream;
@@ -60,14 +60,14 @@ public class DriverOkex implements Driver{
     }
     
     @Override
-    public Set<CoinCoin> stringToArray(String json, NameTable nameTable){
+    public Set<DataCoin> stringToArray(String json, NameTable nameTable){
         logger.info("EX_OKEX - {} делаю из строки массив", nameTable);
-        Set<CoinCoin> set = new HashSet<>();
+        Set<DataCoin> set = new HashSet<>();
         String[] split = json.replaceAll("]", "").replace("[", "").replace("\"", "").split(",");
         int counter = split.length;
         for (int i = 0; i < split.length/6; i++) {
             counter = counter-6;
-            set.add(new CoinCoin(split[counter], //String.valueOf(Time.isoToUnix(split[counter]))
+            set.add(new DataCoin(split[counter], //String.valueOf(Time.isoToUnix(split[counter]))
                     split[counter+1], 
                     split[counter + 2], 
                     split[counter + 3], 

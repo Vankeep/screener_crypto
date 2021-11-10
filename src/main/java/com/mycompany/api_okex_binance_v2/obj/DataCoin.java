@@ -1,6 +1,6 @@
 package com.mycompany.api_okex_binance_v2.obj;
 
-public class CoinCoin {
+public class DataCoin {
 
     String time;
     String open;
@@ -10,7 +10,7 @@ public class CoinCoin {
     String volume;
     NameTable nameTable;
 
-    public CoinCoin(String time, String open, String high, String low, String close, String volume) {
+    public DataCoin(String time, String open, String high, String low, String close, String volume) {
         this.time = time;
         this.open = open;
         this.high = high;
@@ -19,7 +19,7 @@ public class CoinCoin {
         this.volume = volume;
     }
 
-    public CoinCoin(String time, String open, String high, String low, String close, String volume, NameTable nameTable) {
+    public DataCoin(String time, String open, String high, String low, String close, String volume, NameTable nameTable) {
         this.nameTable = nameTable;
         this.time = time;
         this.open = open;
@@ -53,11 +53,6 @@ public class CoinCoin {
         return volume;
     }
 
-    @Override
-    public String toString() {
-        return "CoinCoin{" + "time=" + time + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", volume=" + volume + ", nameTable=" + nameTable + '}';
-    }
-
     public NameTable getNameTable() {
         return nameTable;
     }
@@ -88,6 +83,11 @@ public class CoinCoin {
 
     public void setVolume(String volume) {
         this.volume = volume;
+    }
+
+    @Override
+    public String toString() {
+        return "{" + "time=" + time + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", volume=" + volume + ", nameTable=" + nameTable + '}';
     }
 
 }

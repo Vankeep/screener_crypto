@@ -8,7 +8,7 @@ import com.mycompany.api_okex_binance_v2.constants.Const;
 import com.mycompany.api_okex_binance_v2.database.Database;
 import com.mycompany.api_okex_binance_v2.drivers.Driver;
 import com.mycompany.api_okex_binance_v2.enums.*;
-import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.obj.DataCoin;
 import com.mycompany.api_okex_binance_v2.obj.NameTable;
 import java.io.File;
 import java.io.IOException;
@@ -90,7 +90,7 @@ public class Connect {
      * @param candlesBack свечей назад
      * @return true if evrethink is ok
      */
-    protected Set<CoinCoin> getDataPair(BCoin bCoin, QCoin qCoin, Tf tf, int candlesBack) {
+    protected Set<DataCoin> getDataPair(BCoin bCoin, QCoin qCoin, Tf tf, int candlesBack) {
         logger.debug("{} - загрузка данных пары {}_{}", exchange.getName(), bCoin, qCoin);
         HttpURLConnection url = driver.urlPairMarketData(bCoin, qCoin, tf, candlesBack);
 

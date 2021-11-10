@@ -4,7 +4,7 @@ import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.interfaces.DatabaseClient;
 import com.mycompany.api_okex_binance_v2.enums.*;
 
-import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.obj.DataCoin;
 import com.mycompany.api_okex_binance_v2.obj.NameTable;
 import com.mycompany.api_okex_binance_v2.time.Time;
 import java.util.*;
@@ -105,14 +105,13 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         int counter = 1;
         for (QCoin qCoin : allQcoin) {
             Map<Integer, BCoin> list = getAllPair(qCoin);
-            logger.info("{}",list);
             for (int i = 1; i <= list.size(); i++) {
                 listAllPair.add(new NameTable(list.get(i), qCoin));
             }
         }
         logger.info("{} - обьединяю все монеты из таблиц {} в один лист...",exchange, Arrays.toString(allQcoin));
         //Ищем делистинг
-        logger.info("{} - ищу делистинги...");
+        logger.info("{} - ищу делистинги...",exchange);
         HashSet<NameTable> delisting = new HashSet<>();
         boolean findDelist = false;
         for (NameTable table : listAllTable) {
@@ -128,7 +127,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
             }
         }
         //Ищем листинг
-        logger.info("{} - ищу листинги...");
+        logger.info("{} - ищу листинги...", exchange);
         boolean findList = false;
         HashSet<NameTable> listing = new HashSet<>();
         for (NameTable pair : listAllPair) {
@@ -186,22 +185,22 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     }
 
     @Override
-    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc) {
+    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2) {
+    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3) {
+    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override
-    public ArrayList<CoinCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4) {
+    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4) {
         throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
@@ -232,41 +231,14 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         }
     }
 
-    @Deprecated
     @Override
-    public boolean insertDataPair(Set<CoinCoin> list, BCoin bCoin, QCoin qCoin) {
-        boolean ok = connect();
-        if (ok) {
-            logger.info("{} - запись пары {}_{}", exchange, bCoin, qCoin.toString());
-            for (CoinCoin c : list) {
-                ok = insert(msgInsertBcoin(bCoin, qCoin,
-                        c.getTime(),
-                        c.getOpen(),
-                        c.getHigh(),
-                        c.getLow(),
-                        c.getClose(),
-                        c.getVolume()));
-                if (!ok) {
-                    break;
-                }
-            }
-            close();
-            return ok;
-        } else {
-            close();
-            logger.error("{} - нет соединения с бд", exchange);
-            return ok;
-        }
-    }
-
-    @Override
-    public boolean insertDataPair(Set<Set<CoinCoin>> pairs) {
+    public boolean insertDataPair(Set<Set<DataCoin>> pairs) {
         try {
             boolean ok = connect();
             if (ok) {
                 logger.info("{} - запись пар в БД... ", exchange);
-                for (Set<CoinCoin> pair : pairs) {
-                    for (CoinCoin c : pair) {
+                for (Set<DataCoin> pair : pairs) {
+                    for (DataCoin c : pair) {
                         ok = insert(msgInsertBcoin(c.getNameTable(),
                                 c.getTime(),
                                 c.getOpen(),

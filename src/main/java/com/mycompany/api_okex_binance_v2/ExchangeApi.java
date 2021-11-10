@@ -75,8 +75,8 @@ public class ExchangeApi extends Connect {
      * @return
      */
 
-    public Set<Set<CoinCoin>> downloadDatePair(Set<UpdateCoin> set, Tf tf) {
-        Set<Set<CoinCoin>> setPairs = new HashSet<>();
+    public Set<Set<DataCoin>> downloadDatePair(Set<UpdateCoin> set, Tf tf) {
+        Set<Set<DataCoin>> setPairs = new HashSet<>();
         if (set == null) {
             return null;
         }
@@ -88,7 +88,7 @@ public class ExchangeApi extends Connect {
         for (UpdateCoin coin : set) {
             if (coin.getCandlesBack() >= 0) {
                 logger.info("{} - загружаю {}...",exchange, coin.getNameTable());
-                Set<CoinCoin> pair = getDataPair(coin.getNameTable().getbCoin(), coin.getNameTable().getqCoin(), tf, coin.getCandlesBack());
+                Set<DataCoin> pair = getDataPair(coin.getNameTable().getbCoin(), coin.getNameTable().getqCoin(), tf, coin.getCandlesBack());
                 setPairs.add(pair);
             }
             if(coin.getCandlesBack()==-1){
@@ -97,7 +97,7 @@ public class ExchangeApi extends Connect {
             }
             if(coin.getCandlesBack()==-2){
                 logger.info("{} - Таблица {} пустая, загружаю последние данные", exchange,coin.getNameTable());
-                Set<CoinCoin> pair = getDataPair(coin.getNameTable().getbCoin(), coin.getNameTable().getqCoin(), tf,0);
+                Set<DataCoin> pair = getDataPair(coin.getNameTable().getbCoin(), coin.getNameTable().getqCoin(), tf,0);
                 setPairs.add(pair);
                 
             }
@@ -121,7 +121,7 @@ public class ExchangeApi extends Connect {
         return setPairs;
     }
 
-    public boolean insertDataPair(Set<Set<CoinCoin>> pairs) {
+    public boolean insertDataPair(Set<Set<DataCoin>> pairs) {
         boolean ok = exDatabaseClient.insertDataPair(pairs);
         if (ok) {
             logger.info("{} - Данные успешно записаны в БД", exchange);

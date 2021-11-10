@@ -4,7 +4,7 @@ import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.google.gson.*;
 import com.mycompany.api_okex_binance_v2.enums.*;
 import com.mycompany.api_okex_binance_v2.drivers.Driver;
-import com.mycompany.api_okex_binance_v2.obj.CoinCoin;
+import com.mycompany.api_okex_binance_v2.obj.DataCoin;
 import com.mycompany.api_okex_binance_v2.obj.NameTable;
 import com.mycompany.api_okex_binance_v2.time.Time;
 import java.io.File;
@@ -56,14 +56,14 @@ public class DriverBinance implements Driver{
     }
     
     @Override
-    public Set<CoinCoin> stringToArray(String json, NameTable nameTable) {
+    public Set<DataCoin> stringToArray(String json, NameTable nameTable) {
         logger.info("EX_BINANCE - {} делаю из строки массив", nameTable);
-        Set<CoinCoin> set = new HashSet<>();
+        Set<DataCoin> set = new HashSet<>();
         String[] split = json.replaceAll("]", "").replace("[", "").replace("\"", "").split(",");
         int counter = 0;
         for (int i = 0; i < split.length / 12; i++) {
             String convertTime = Time.unixToIso(Long.parseLong(split[counter]));
-            set.add(new CoinCoin(convertTime, 
+            set.add(new DataCoin(convertTime, 
                     split[counter + 1],
                     split[counter + 2], 
                     split[counter + 3], 
