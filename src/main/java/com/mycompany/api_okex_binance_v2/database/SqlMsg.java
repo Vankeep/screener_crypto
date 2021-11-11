@@ -14,7 +14,7 @@ public class SqlMsg {
      * @param qCoin имя таблицы
      * @return строка
      */
-    public String msgCreateTable(QCoin qCoin) {
+    public static String createTable(QCoin qCoin) {
         String message = "CREATE TABLE " + qCoin + " ("
                 + " id INTEGER PRIMARY KEY AUTOINCREMENT,"
                 + " nameCoin VARCHAR(10))";
@@ -31,7 +31,7 @@ public class SqlMsg {
      *         time DOUBLE, open DOUBLE, high DOUBLE, low DOUBLE, close DOUBLE,
      *         volume DOUBLE)
      */
-    public String msgCreateTable(NameTable nameTable) {
+    public static String createTable(NameTable nameTable) {
         ColumnsTable[] columns = ColumnsTable.values();
         String message = "CREATE TABLE " + nameTable + " ( " + columns[0];
         for (int i = 1; i < columns.length; i++) {
@@ -46,7 +46,7 @@ public class SqlMsg {
      * @param qCoin монета котировки чью таблицу надо удалить
      * @return DROP TABLE USDT
      */
-    public String msgDeleteTable(QCoin qCoin) {
+    public static String deleteTable(QCoin qCoin) {
         return "DROP TABLE " + qCoin;
     }
 
@@ -56,7 +56,7 @@ public class SqlMsg {
      * @param nameTable имя таблицы
      * @return DROP TABLE bCoin_qCoin
      */
-    public String msgDeleteTable(NameTable nameTable) {
+    public static String deleteTable(NameTable nameTable) {
         return "DROP TABLE " + nameTable;
     }
 
@@ -66,7 +66,7 @@ public class SqlMsg {
      * @param nameTable
      * @return
      */
-    public String msgLastUpdatePair(NameTable nameTable) {
+    public static String lastUpdatePair(NameTable nameTable) {
         return "SELECT * FROM " + nameTable + " ORDER BY time DESC LIMIT 1";
     }
 
@@ -84,7 +84,7 @@ public class SqlMsg {
      * @return INSERT INTO bCoin_qCoin ( time, open, high, low, close, volume)
      *         VALUES ('123', '321', '234', '123', '345', '654')
      */
-    public String msgInsertDataCoin(BCoin bCoin, QCoin qCoin, String time, double open, double high, double low, double close, double volume) {
+    public static String insertDataCoin(BCoin bCoin, QCoin qCoin, String time, double open, double high, double low, double close, double volume) {
         String message = "INSERT INTO " + bCoin + "_" + qCoin + " ( "
                 + ColumnsTable.TIME.getName() + ", "
                 + ColumnsTable.OPEN.getName() + ", "
@@ -103,8 +103,7 @@ public class SqlMsg {
 
     }
 
-    @Deprecated
-    public String msgInsertDataCoin(NameTable nameTable, String time, double open, double high, double low, double close, double volume) {
+    public static String insertDataCoin(NameTable nameTable, String time, double open, double high, double low, double close, double volume) {
         String message = "INSERT INTO " + nameTable + " ( "
                 + ColumnsTable.TIME.getName() + ", "
                 + ColumnsTable.OPEN.getName() + ", "
@@ -132,7 +131,7 @@ public class SqlMsg {
      * @return INSERT INTO nameTable ( nameCoin ) VALUES ( 'bCoin' )
      */
     @Deprecated
-    public String msgInsertQcoin(NameTable nameTable, BCoin bCoin) {
+    public static String insertQcoin(NameTable nameTable, BCoin bCoin) {
         return "INSERT INTO " + nameTable + " ( nameCoin ) VALUES ( '" + bCoin + "' )";
     }
 
@@ -144,7 +143,7 @@ public class SqlMsg {
      * @param bCoin base coin
      * @return INSERT INTO nameTable ( nameCoin ) VALUES ( 'bCoin' )
      */
-    public String msgInsertQcoin(QCoin qCoin, BCoin bCoin) {
+    public static String insertQcoin(QCoin qCoin, BCoin bCoin) {
         return "INSERT INTO " + qCoin + " ( nameCoin ) VALUES ( '" + bCoin + "' )";
     }
 
@@ -156,7 +155,7 @@ public class SqlMsg {
      * @return SELECT time, open, high, low, close, volume FROM bCoin_qCoin
      */
     @Deprecated
-    public String msgReadBcoin(BCoin bCoin, QCoin qCoin) {
+    public static String readBcoin(BCoin bCoin, QCoin qCoin) {
         return "SELECT time, open, high, low, close, volume FROM " + bCoin + "_" + qCoin;
     }
 
@@ -169,7 +168,7 @@ public class SqlMsg {
      * @return SELECT time, open, high, low, close, volume FROM nameTable ORDER
      *         BY id DESC LIMIT lengthData
      */
-    public String msgReadDataCoin(NameTable nameTable, int lengthData) {
+    public static String readDataCoin(NameTable nameTable, int lengthData) {
         String message = "SELECT "
                 + ColumnsTable.TIME.getName() + ", "
                 + ColumnsTable.OPEN.getName() + ", "
@@ -191,7 +190,7 @@ public class SqlMsg {
      * @param one_day тф выбранного индикатора
      * @return строку
      */
-    public String msgReadDataIndicator(NameTable nameTable, int lengthData, ColumnsTable one_hour, ColumnsTable four_hour, ColumnsTable one_day){
+    public static String readDataIndicator(NameTable nameTable, int lengthData, ColumnsTable one_hour, ColumnsTable four_hour, ColumnsTable one_day){
         String message = "SELECT "
                 + one_hour + ", "
                 + four_hour + ", "
@@ -207,7 +206,7 @@ public class SqlMsg {
      * @param qCoin quote coin
      * @return SELECT nameCoin FROM qCoin
      */
-    public String msgReadQcoin(QCoin qCoin) {
+    public static String readQcoin(QCoin qCoin) {
         return "SELECT id, nameCoin FROM " + qCoin;
     }
 
@@ -216,7 +215,7 @@ public class SqlMsg {
      *
      * @return
      */
-    public String msgSeeAllTable() {
+    public static String seeAllTable() {
         return "SELECT name FROM sqlite_master WHERE type = \"table\"";
     }
 

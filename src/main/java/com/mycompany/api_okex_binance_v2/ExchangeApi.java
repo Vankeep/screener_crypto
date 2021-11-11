@@ -2,6 +2,8 @@ package com.mycompany.api_okex_binance_v2;
 
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.enums.*;
+import com.mycompany.api_okex_binance_v2.indicators.DataIndicator;
+import com.mycompany.api_okex_binance_v2.indicators.IndicatorClient;
 import com.mycompany.api_okex_binance_v2.net.Connect;
 import com.mycompany.api_okex_binance_v2.obj.*;
 import com.mycompany.api_okex_binance_v2.time.Time;
@@ -126,15 +128,19 @@ public class ExchangeApi extends Connect {
     }
 
     /**
-     * Возвращает Map, где ключ - имя таблицы, значение - лист со списком данных
-     * в указанном диапазоне candlesBack
+     * Возвращает Map, где ключ - имя таблицы, значение - лист с DataCoin
+     * time, open, high, low, close, volume  в указанном диапазоне candlesBack
      *
      * @param nameTables  имя таблицы
      * @param candlesBack Отсчет от 1. сколько часов назад.
      * @return см описание
      */
-    public Map<NameTable, List<DataCoin>> getDataPairFromDatabase(NameTable[] nameTables, int candlesBack) {
+    public Map<NameTable, List<DataCoin>> getDataPairFromDatabase(Set<NameTable> nameTables, int candlesBack) {
         return database.getDataPair(nameTables, candlesBack);
+    }
+
+    public Map<NameTable, List<DataIndicator>> insertDataIndicatorFromDatabase(NameTable[] nameTables) {
+        return null;
     }
 
     /**
@@ -151,7 +157,7 @@ public class ExchangeApi extends Connect {
         }
         return false;
     }
-    
+
     /**
      * Загружает данные из интернета. Можно запустить только с помощью данных из
      * функции getLastUpdateTimeDatabase

@@ -1,25 +1,21 @@
 package com.mycompany.api_okex_binance_v2.database;
 
+import com.mycompany.api_okex_binance_v2.Api;
 import com.mycompany.api_okex_binance_v2.constants.Const;
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
-import com.mycompany.api_okex_binance_v2.enums.Exchange;
-import com.mycompany.api_okex_binance_v2.enums.ColumnsTable;
-import com.mycompany.api_okex_binance_v2.enums.QCoin;
-import com.mycompany.api_okex_binance_v2.obj.CalculationCoin;
-import com.mycompany.api_okex_binance_v2.obj.DataCoin;
-import com.mycompany.api_okex_binance_v2.obj.NameTable;
+import com.mycompany.api_okex_binance_v2.enums.*;
+import com.mycompany.api_okex_binance_v2.net.Connect;
+import com.mycompany.api_okex_binance_v2.obj.*;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.*;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.sqlite.SQLiteErrorCode;
 
-public class DBInsertAndRead extends SqlMsg {
+public class DBInsertAndRead {
 
     private static final Logger logger = LoggerFactory.getLogger(DBInsertAndRead.class.getSimpleName());
     SqlMsg sqlMessage = new SqlMsg();
@@ -30,6 +26,7 @@ public class DBInsertAndRead extends SqlMsg {
     public DBInsertAndRead(Exchange exchange) {
         this.exchange = exchange;
     }
+
 
     /**
      * Подключение к БД
@@ -70,7 +67,7 @@ public class DBInsertAndRead extends SqlMsg {
      */
     public String readLastUpdatePair(NameTable nameTable) {
         String time = "";
-        String message = msgLastUpdatePair(nameTable);
+        String message = SqlMsg.lastUpdatePair(nameTable);
         try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(message);
@@ -92,7 +89,7 @@ public class DBInsertAndRead extends SqlMsg {
     public Set<NameTable> readAllTableName() {
         Set<NameTable> list = new HashSet<>();
         Set<String> deleteList = new HashSet<>();
-        String message = msgSeeAllTable();
+        String message = SqlMsg.seeAllTable();
         boolean notEqual = true;
         try {
             statement = connection.createStatement();
@@ -153,7 +150,7 @@ public class DBInsertAndRead extends SqlMsg {
      */
     public List<DataCoin> readDataPair(NameTable nameTable, int candlesBack) {
         List<DataCoin> data = new ArrayList<>(candlesBack);
-        String message = msgReadDataCoin(nameTable, candlesBack);
+        String message = SqlMsg.readDataCoin(nameTable, candlesBack);
         try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(message);

@@ -1,48 +1,27 @@
 package com.mycompany.api_okex_binance_v2.net;
 
+import com.mycompany.api_okex_binance_v2.Api;
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
-import com.mycompany.api_okex_binance_v2.database.DatabaseClient;
-import com.mycompany.api_okex_binance_v2.drivers.okex.*;
-import com.mycompany.api_okex_binance_v2.drivers.binance.*;
 import com.mycompany.api_okex_binance_v2.constants.Const;
-import com.mycompany.api_okex_binance_v2.database.Database;
-import com.mycompany.api_okex_binance_v2.drivers.Driver;
 import com.mycompany.api_okex_binance_v2.enums.*;
 import com.mycompany.api_okex_binance_v2.obj.DataCoin;
 import com.mycompany.api_okex_binance_v2.obj.NameTable;
 import java.io.File;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Connect {
+public class Connect extends Api{
 
     private static final Logger logger = LoggerFactory.getLogger(Connect.class.getSimpleName());
 
-    public Driver driver;
-    public Exchange exchange;
-    public DatabaseClient database;
-
     public Connect(Exchange exchange) {
-        if (exchange == Exchange.EX_BINANCE) {
-            logger.info("Создаю обьккт DriverBinance");
-            this.driver = new Binance();
-
-        } else {
-            logger.info("Создаю обьект DriverOkex");
-            this.driver = new Okex();
-        }
-
-        //this.exHttpClient = new Connect(exchange);
-        this.database = new Database(exchange);
-        this.exchange = exchange;
+        super(exchange);
     }
-
     /**
      * Возвращает массив со скачанными и отсортированными монетами. Количество
      * элементов в мапе будет ровняться количеству обьектов в enum QCoin.

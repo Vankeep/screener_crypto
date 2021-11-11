@@ -2,16 +2,13 @@ package com.mycompany.api_okex_binance_v2.database;
 
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.enums.*;
-import com.mycompany.api_okex_binance_v2.obj.CalculationCoin;
-
-import com.mycompany.api_okex_binance_v2.obj.DataCoin;
-import com.mycompany.api_okex_binance_v2.obj.NameTable;
+import com.mycompany.api_okex_binance_v2.obj.*;
 import com.mycompany.api_okex_binance_v2.time.Time;
 import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class Database extends DBInsertAndRead implements DatabaseClient {
+public class Database extends DBInsertAndRead {
 
     private static final Logger logger = LoggerFactory.getLogger(Database.class.getSimpleName());
 
@@ -19,8 +16,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         super(exchange);
     }
 
-    @Override
-    public boolean sendMessage(String message) {
+    private boolean sendMessage(String message) {
         boolean ok = false;
         if (connect()) {
             ok = insert(message);
@@ -29,34 +25,31 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         return ok;
     }
 
-    @Override
-    public boolean createAllTable(QCoin qCoin) {
+    private boolean createAllTable(QCoin qCoin) {
         boolean ok = false;
         Set<NameTable> list = getAllPair(qCoin);
         if (connect()) {
             for (NameTable nameTable : list) {
-                ok = insert(msgCreateTable(nameTable));
+                ok = insert(SqlMsg.createTable(nameTable));
             }
             close();
         }
         return ok;
     }
 
-    @Override
-    public boolean deleteAllTable(QCoin qCoin) {
+    private boolean deleteAllTable(QCoin qCoin) {
         boolean ok = false;
         Set<NameTable> list = getAllPair(qCoin);
         if (connect()) {
             logger.info("{} - yдаляю все таблицы к {}", exchange, qCoin);
             for (NameTable nameTable : list) {
-                ok = insert(msgDeleteTable(nameTable));
+                ok = insert(SqlMsg.deleteTable(nameTable));
             }
             close();
         }
         return ok;
     }
 
-    @Override
     public int getLastUpdateTimePair(NameTable nameTable) {
         String lastUpdateIso = "";
         if (connect()) {
@@ -84,7 +77,6 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
 
     }
 
-    @Override
     public boolean cleaningDatabase() {
         //Лист всех таблиц
         Set<NameTable> listAllTable = null;
@@ -143,7 +135,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         //Удаляем делистинг
         logger.info("{} - удаляю таблицы - {}...", exchange, delisting);
         for (NameTable table : delisting) {
-            if (sendMessage(msgDeleteTable(table))) {
+            if (sendMessage(SqlMsg.deleteTable(table))) {
                 logger.info("Удалена неактуальная таблица {}", table);
             }
         }
@@ -151,7 +143,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         //Создаем все недостающие таблицы
         logger.info("{} - создаю таблицы - {}...", exchange, listing);
         for (NameTable table : listing) {
-            if (sendMessage(msgCreateTable(table))) {
+            if (sendMessage(SqlMsg.createTable(table))) {
                 logger.info("Создана новая таблица {}", table);
             }
         }
@@ -162,12 +154,11 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
 
     }
 
-    @Override
     public Set<NameTable> getAllPair(QCoin qCoin) {
         logger.info("{} - чтение таблицы {}", exchange, qCoin);
         if (connect()) {
             try {
-                Set<NameTable> set = readAllPair(msgReadQcoin(qCoin), qCoin);
+                Set<NameTable> set = readAllPair(SqlMsg.readQcoin(qCoin), qCoin);
                 close();
                 return set;
             } catch (NullPointerException ex) {
@@ -179,12 +170,11 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         return null;
     }
 
-    @Override
-    public Map<NameTable, List<DataCoin>> getDataPair(NameTable[] tables, int candlesBack) {
+    public Map<NameTable, List<DataCoin>> getDataPair(Set<NameTable> nameTables, int candlesBack) {
         int counter = 0;
         Map<NameTable, List<DataCoin>> map = new HashMap<>();
         if (connect()) {
-            for (NameTable table : tables) {
+            for (NameTable table : nameTables) {
                 try {
                     logger.info("{} - чтение таблицы {}", exchange, table);
                     List<DataCoin> data = readDataPair(table, candlesBack);
@@ -199,16 +189,18 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         close();
         return map;
     }
-    
-    @Override
+
     public boolean insertDataPair(Map<NameTable, List<DataCoin>> pairs) {
+        if (pairs == null) {
+            logger.error("Map<NameTable, List<DataCoin>> = null. Сет для записи данных в БД пустой");
+        }
         try {
             boolean ok = connect();
             if (ok) {
                 logger.info("{} - запись пар в БД... ", exchange);
                 for (Map.Entry<NameTable, List<DataCoin>> entry : pairs.entrySet()) {
                     for (DataCoin c : entry.getValue()) {
-                        ok = insert(msgInsertDataCoin(entry.getKey(),
+                        ok = insert(SqlMsg.insertDataCoin(entry.getKey(),
                                 c.getTime(),
                                 c.getOpen(),
                                 c.getHigh(),
@@ -223,6 +215,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
                 }
                 close();
                 pairs.clear();
+                logger.info("{} - данные всех пар в БД успешно обновлены", exchange);
                 return ok;
             } else {
                 close();
@@ -236,17 +229,17 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
             return false;
         }
     }
-    @Override
+
     public boolean insertAllExInfo(HashMap<QCoin, HashSet<BCoin>> list) {
         boolean ok = connect();
         if (ok) {
             for (Map.Entry<QCoin, HashSet<BCoin>> entry : list.entrySet()) {
                 logger.info("Базовый актив - {} , Массив данных - {}", entry.getKey(), entry.getValue().toString());
                 QCoin key = entry.getKey();
-                insert(msgDeleteTable(entry.getKey()));
-                insert(msgCreateTable(entry.getKey()));
+                insert(SqlMsg.deleteTable(entry.getKey()));
+                insert(SqlMsg.createTable(entry.getKey()));
                 for (BCoin bCoin : entry.getValue()) {
-                    ok = insert(msgInsertQcoin(entry.getKey(), bCoin));
+                    ok = insert(SqlMsg.insertQcoin(entry.getKey(), bCoin));
                     if (!ok) {
                         break;
                     }
