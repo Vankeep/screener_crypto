@@ -1,4 +1,4 @@
-package com.mycompany.api_okex_binance_v2.interfaces;
+package com.mycompany.api_okex_binance_v2.database;
 
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.enums.*;
@@ -37,11 +37,10 @@ public interface DatabaseClient {
      * Возвращает в часах когда было последниее обновление<p>
      * -1 данные актуальные, 0 - один час, 1 - два часа, и.т.п.
      *
-     * @param bCoin базовая монета
-     * @param qCoin монета котировки
+     * @param nameTable имя таблицы
      * @return количество необходимых свечей
      */
-    public int getLastUpdateTimePair(BCoin bCoin, QCoin qCoin);
+    public int getLastUpdateTimePair(NameTable nameTable);
 
     /**
      * Получить список всех таблиц в базе данных
@@ -51,13 +50,13 @@ public interface DatabaseClient {
     public boolean cleaningDatabase();
 
     /**
-     * Получить из базы данных все пары переданной в парамерты функции монеты
-     * котировки. Отсчет индексов в HashMap начинается с 1
+     * Возвращает Set со всеми актуальными таблицами в БД. Таблицы беруться в
+     * соотвествии со списом монет в таблицах монет котировок
      *
      * @param qCoin монета котировки
      * @return HashMap
      */
-    public Map<Integer, BCoin> getAllPair(QCoin qCoin);
+    public Set<NameTable> getAllPair(QCoin qCoin);
 
     /**
      * Чтение данных из бд

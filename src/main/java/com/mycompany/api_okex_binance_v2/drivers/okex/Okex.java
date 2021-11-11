@@ -25,7 +25,6 @@ public class Okex implements Driver{
     public HashMap<QCoin, HashSet<BCoin>> fileToArray(File fail) {
         logger.info("EX_OKEX - Перетаскиваю даные из okex.bin в массив");
         HashMap<QCoin, HashSet<BCoin>> list = new HashMap<>();
-        QCoin[] qCoins = QCoin.getListQCoin();
 
         StringBuilder sb = new StringBuilder();
         FileInputStream fis;
@@ -39,7 +38,7 @@ public class Okex implements Driver{
 
             Gson gson = new Gson();
             CoinOKEX[] pair = gson.fromJson(sb.toString(), CoinOKEX[].class);
-            for (QCoin qCoin : qCoins) {
+            for (QCoin qCoin : QCoin.values()) {
                 HashSet<BCoin> set = new HashSet<>();
                 for (CoinOKEX cokex : pair) {
                     if (cokex.getQuote_currency().equals(qCoin.toString())) {

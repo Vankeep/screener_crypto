@@ -14,8 +14,5 @@ public enum QCoin {
     public String toString() {
         return name;
     }
-    public static QCoin[] getListQCoin(){
-        return new QCoin[]{QCoin.BTC, QCoin.ETH, QCoin.USDT};
-    }
     
 }

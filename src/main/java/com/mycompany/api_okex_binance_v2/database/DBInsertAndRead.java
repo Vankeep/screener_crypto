@@ -61,8 +61,16 @@ public class DBInsertAndRead extends SqlMsg {
 
     }
 
-    public String readLastUpdatePair(String message) {
+    /**
+     * Чтение последней строки в таблице, чтобы узнать последнее время
+     * обновления
+     *
+     * @param nameTable имя таблицы
+     * @return значение последней колонки time
+     */
+    public String readLastUpdatePair(NameTable nameTable) {
         String time = "";
+        String message = msgLastUpdatePair(nameTable);
         try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(message);
@@ -76,10 +84,15 @@ public class DBInsertAndRead extends SqlMsg {
         }
     }
 
-    public Set<NameTable> readAllTableName(String message) {
-        QCoin[] qCoins = QCoin.getListQCoin();
+    /**
+     * Чтение всех таблиц в файле базы данных
+     *
+     * @return HashSet со всеми таблицами в бд
+     */
+    public Set<NameTable> readAllTableName() {
         Set<NameTable> list = new HashSet<>();
         Set<String> deleteList = new HashSet<>();
+        String message = msgSeeAllTable();
         boolean notEqual = true;
         try {
             statement = connection.createStatement();
@@ -87,7 +100,7 @@ public class DBInsertAndRead extends SqlMsg {
             while (rs.next()) {
                 try {
                     String[] name = rs.getString("name").split("_");
-                    for (QCoin qCoin : qCoins) {
+                    for (QCoin qCoin : QCoin.values()) {
                         if (qCoin.toString().equals(name[1])) {
                             list.add(new NameTable(new BCoin(name[0]), qCoin));
                         }
@@ -104,8 +117,16 @@ public class DBInsertAndRead extends SqlMsg {
 
     }
 
-    public Map<Integer, BCoin> readAllPair(String message) {
-        Map<Integer, BCoin> map = new HashMap<>();
+    /**
+     * Чтение всех таблиц соответвующих актуальным монетам в списках BTC ETH
+     * USDT
+     *
+     * @param message
+     * @param qCoin
+     * @return HashSet с актуальными таблицами
+     */
+    public Set<NameTable> readAllPair(String message, QCoin qCoin) {
+        Set<NameTable> set = new HashSet<>();
         try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(message);
@@ -113,27 +134,38 @@ public class DBInsertAndRead extends SqlMsg {
             while (rs.next()) {
                 int key = rs.getInt("id");
                 BCoin nameCoin = new BCoin(rs.getString("nameCoin"));
-                map.put(key, nameCoin);
+                NameTable nameTable = new NameTable(nameCoin, qCoin);
+                set.add(nameTable);
             }
-            return map;
+            return set;
         } catch (SQLException ex) {
             logger.error("{} - {}. Сообщение - {}", exchange, ex.getMessage(), message);
             return null;
         }
     }
 
-    public List<DataCoin> readDataPair(int lengthData, String message) {
-        List<DataCoin> data = new ArrayList<>(lengthData);
+    /**
+     * Чтение данных в указанном диапазоне candlesBack из указанной таблицы
+     *
+     * @param candlesBack сколько свечей назад. Отсчет от нуля
+     * @param nameTable   имя таблицы
+     * @return Лист с данными по указзаной таблице
+     */
+    public List<DataCoin> readDataPair(NameTable nameTable, int candlesBack) {
+        List<DataCoin> data = new ArrayList<>(candlesBack);
+        String message = msgReadDataCoin(nameTable, candlesBack);
         try {
             statement = connection.createStatement();
             ResultSet rs = statement.executeQuery(message);
             int counter = 0;
             while (rs.next()) {
+                String time = rs.getString("time");
                 double open = rs.getDouble("open");
                 double high = rs.getDouble("high");
                 double low = rs.getDouble("low");
                 double close = rs.getDouble("close");
-                data.add(new DataCoin(open, high, low, close, close));
+                double volume = rs.getDouble("volume");
+                data.add(new DataCoin(time, open, high, low, close, volume));
             }
             return data;
 
@@ -144,6 +176,9 @@ public class DBInsertAndRead extends SqlMsg {
 
     }
 
+    /**
+     * Закрыть подключение к БД
+     */
     public void close() {
         try {
             //logger.info("{} - база отключена", exchange.getName());

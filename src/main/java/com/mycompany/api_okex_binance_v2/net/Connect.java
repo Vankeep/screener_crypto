@@ -1,7 +1,7 @@
 package com.mycompany.api_okex_binance_v2.net;
 
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
-import com.mycompany.api_okex_binance_v2.interfaces.DatabaseClient;
+import com.mycompany.api_okex_binance_v2.database.DatabaseClient;
 import com.mycompany.api_okex_binance_v2.drivers.okex.*;
 import com.mycompany.api_okex_binance_v2.drivers.binance.*;
 import com.mycompany.api_okex_binance_v2.constants.Const;
@@ -23,36 +23,31 @@ import org.slf4j.LoggerFactory;
 public class Connect {
 
     private static final Logger logger = LoggerFactory.getLogger(Connect.class.getSimpleName());
-    
+
     public Driver driver;
     public Exchange exchange;
     public DatabaseClient database;
 
     public Connect(Exchange exchange) {
-        if (exchange == Exchange.EX_BINANCE){
+        if (exchange == Exchange.EX_BINANCE) {
             logger.info("Создаю обьккт DriverBinance");
             this.driver = new Binance();
-            
+
         } else {
             logger.info("Создаю обьект DriverOkex");
             this.driver = new Okex();
         }
-        
+
         //this.exHttpClient = new Connect(exchange);
         this.database = new Database(exchange);
         this.exchange = exchange;
     }
 
     /**
-     * Метод не полиморфен. Первное значение в массиве это quote_coin.
-     * <p>
-     * 1 - > [BTC, GO, BNB, ETH, USDT,....]
-     * <p>
-     * 2 - > [ETH, ALGO, BTC, XRP, SOL,.....]
-     * <p>
-     * 3 - > [USDT, BTC, ETH, BNB, DODO...]
+     * Возвращает массив со скачанными и отсортированными монетами. Количество
+     * элементов в мапе будет ровняться количеству обьектов в enum QCoin.
      *
-     * @return три массива
+     * @return
      */
     protected HashMap<QCoin, HashSet<BCoin>> getAllExInfo() {
         logger.info("{} - загружаю все пары в файл bin", exchange);
@@ -65,7 +60,7 @@ public class Connect {
                 return null;
             }
         } catch (IOException e) {
-            logger.error("{} - ошибка соединения. {}",exchange, e.getMessage());
+            logger.error("{} - ошибка соединения. {}", exchange, e.getMessage());
             return null;
         }
 
@@ -82,37 +77,36 @@ public class Connect {
     }
 
     /**
-     * Загрузка данных по выбранной паре
+     * Загрузка из сети данных по указанной таблице
      *
-     * @param bCoin base currency
-     * @param qCoin quote currency
-     * @param tf need timeframe
+     * @param nameTable 
+     * @param tf          need timeframe
      * @param candlesBack свечей назад
      * @return true if evrethink is ok
      */
-    protected List<DataCoin> getDataPair(BCoin bCoin, QCoin qCoin, Tf tf, int candlesBack) {
-        logger.debug("{} - загрузка данных пары {}_{}", exchange, bCoin, qCoin);
-        HttpURLConnection url = driver.urlPairMarketData(bCoin, qCoin, tf, candlesBack);
+    protected List<DataCoin> getDataPair(NameTable nameTable, Tf tf, int candlesBack) {
+        logger.debug("{} - загрузка данных пары {}", exchange, nameTable);
+        HttpURLConnection url = driver.urlPairMarketData(nameTable.getbCoin(), nameTable.getqCoin(), tf, candlesBack);
 
         try {
             if (!checkResponseCode(url.getResponseCode())) {
                 return null;
             }
         } catch (IOException e) {
-            logger.error("{} - ошибка соединения. {}",exchange, e.getMessage());
+            logger.error("{} - ошибка соединения. {}", exchange, e.getMessage());
             return null;
         }
 
         String json = ConnectJson.getJsonString(url);
         if (json != null) {
-            return driver.stringToArray(json, new NameTable(bCoin,qCoin));
+            return driver.stringToArray(json, nameTable);
         } else {
             return null;
         }
     }
 
     /**
-     * Проверяет ошибки севера и пишет что за ошибка
+     * Проверяет ошибки севера и выводит в консоль ошибку
      *
      * @param code код ошибки
      * @return

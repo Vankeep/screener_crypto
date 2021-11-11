@@ -2,6 +2,7 @@ package com.mycompany.api_okex_binance_v2;
 
 
 import com.mycompany.api_okex_binance_v2.database.Database;
+import com.mycompany.api_okex_binance_v2.database.SqlMsg;
 import com.mycompany.api_okex_binance_v2.enums.*;
 import com.mycompany.api_okex_binance_v2.obj.*;
 import java.util.*;
@@ -14,16 +15,23 @@ public class MainClass {
 
     public static void main(String[] args) {
         ExchangeApi okex = new ExchangeApi(Exchange.EX_OKEX);
-        Database ok = new Database(Exchange.EX_OKEX);
-        
-        //okex.insertDataPairFromDatabase(okex.downloadDatePairFromNet(okex.getLastUpdateTimeDatabase(QCoin.ETH, 20), Tf.HOUR_ONE));
-        NameTable[] nameTable = new NameTable[]{new NameTable(new BCoin("XLM"), QCoin.ETH), new NameTable(new BCoin("SOL"), QCoin.ETH)};
+//        okex.updateAllExInfo();
+//        okex.cleaningDatabase();
+//        for (QCoin arg : QCoin.values()) {
+//            ok.deleteAllTable(arg);
+//        }
+//        okex.cleaningDatabase();
+        //okex.insertDataPairFromDatabase(okex.downloadDatePairFromNet(okex.getLastUpdateTimeDatabase(QCoin.ETH), Tf.HOUR_ONE));
+       
+        NameTable[] nameTable = new NameTable[]{new NameTable(new BCoin("XLM"), QCoin.ETH)};
         Map<NameTable, List<DataCoin>> data = okex.getDataPairFromDatabase(nameTable, 14);
         int co = 1;
         for (Map.Entry<NameTable, List<DataCoin>> entry : data.entrySet()) {
+            co = 1;
             for (DataCoin coinData : entry.getValue()) {
-                logger.info("{} {} {} {} {} {} {}", entry.getKey(),
+                logger.info("{} {} {} {} {} {} {} {}", entry.getKey(),
                         co,
+                        coinData.getTime(),
                         coinData.getOpen(),
                         coinData.getHigh(),
                         coinData.getLow(),

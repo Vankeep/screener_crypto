@@ -1,39 +1,43 @@
 package com.mycompany.api_okex_binance_v2.database;
 
-import com.mycompany.api_okex_binance_v2.enums.ColumnsTable;
+import com.mycompany.api_okex_binance_v2.enums.*;
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
-import com.mycompany.api_okex_binance_v2.enums.QCoin;
 import com.mycompany.api_okex_binance_v2.obj.NameTable;
 
 public class SqlMsg {
 
-    class Msg {
-
-        String message;
-
-        public Msg(String message) {
-            this.message = message;
-        }
-
-        public String getMessage() {
-            return message;
-        }
-
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
+    /**
+     * Создание таблицы монеты котровки (USDT, BTC, ETH)
+     * <p>
+     * Заголовки таблицы: id, nameCoin
+     *
+     * @param qCoin имя таблицы
+     * @return строка
+     */
+    public String msgCreateTable(QCoin qCoin) {
+        String message = "CREATE TABLE " + qCoin + " ("
+                + " id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + " nameCoin VARCHAR(10))";
+        return message;
     }
 
     /**
-     * Удаление таблицы для монеты на случай делистинга
+     * Создание таблицы для монеты на случай листинга.
+     * <p>
+     * Заголовки таблицы: time, open, high, low, close, volume
      *
-     * @param bCoin базовая монета
-     * @param qCoin монета котировки
-     * @return DROP TABLE bCoin_qCoin
+     * @param nameTable имя таблицы
+     * @return CREATE TABLE nameTable ( id INTNGER PRIMARY KEY AUTOINCREMENT,
+     *         time DOUBLE, open DOUBLE, high DOUBLE, low DOUBLE, close DOUBLE,
+     *         volume DOUBLE)
      */
-    public String msgDeleteTable(BCoin bCoin, QCoin qCoin) {
-        return "DROP TABLE " + bCoin + "_" + qCoin;
+    public String msgCreateTable(NameTable nameTable) {
+        ColumnsTable[] columns = ColumnsTable.values();
+        String message = "CREATE TABLE " + nameTable + " ( " + columns[0];
+        for (int i = 1; i < columns.length; i++) {
+            message += ", " + columns[i];
+        }
+        return message + " )";
     }
 
     /**
@@ -57,84 +61,13 @@ public class SqlMsg {
     }
 
     /**
-     * Создание списка всех монет к выбранной котировке (USDT, BTC, ETH)
-     * <p>
-     * Заголовки таблицы: id, nameCoin
-     * <p>
-     * Имя таблицы: BTC
-     * <p>
-     * CREATE TABLE qCoin ( id INTEGER PRIMARY KEY AUTOINCREMENT, nameCoin
-     * VARCHAR(10))
-     *
-     * @param qCoin имя таблицы
-     * @return строка
-     */
-    public String msgCreateTable(QCoin qCoin) {
-        String message = "CREATE TABLE " + qCoin + " ("
-                + " id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + " nameCoin VARCHAR(10))";
-        return message;
-    }
-
-    /**
-     * Создание таблицы для монеты на случай листинга.
-     * <p>
-     * Заголовки таблицы: time, open, high, low, close, volume
-     * <p>
-     * Имя таблицы: BTC_USDT
-     *
-     * @param bCoin базовая монета
-     * @param qCoin монета котировки
-     * @return CREATE TABLE bCoin_qCoin ( time VARCHAR(30), open VARCHAR(30),
-     *         high VARCHAR(30), low VARCHAR(30), close VARCHAR(30), volume
-     *         VARCHAR(30))
-     */
-    public String msgCreateTable(BCoin bCoin, QCoin qCoin) {
-        String message = "CREATE TABLE " + bCoin + "_" + qCoin + " ("
-                + " id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + " time DOUBLE,"
-                + " open DOUBLE,"
-                + " high DOUBLE,"
-                + " low DOUBLE,"
-                + " close DOUBLE,"
-                + " volume DOUBLE)";
-        return message;
-    }
-
-    /**
-     * Создание таблицы для монеты на случай листинга.
-     * <p>
-     * Заголовки таблицы: time, open, high, low, close, volume
-     * <p>
-     * Имя таблицы: BTC_USDT
-     *
-     * @param nameTable имя таблицы
-     * @return CREATE TABLE bCoin_qCoin ( time VARCHAR(30), open VARCHAR(30),
-     *         high VARCHAR(30), low VARCHAR(30), close VARCHAR(30), volume
-     *         VARCHAR(30))
-     */
-    public String msgCreateTable(NameTable nameTable) {
-
-        String message = "CREATE TABLE " + nameTable + " ("
-                + " id INTEGER PRIMARY KEY AUTOINCREMENT,"
-                + " time DOUBLE,"
-                + " open DOUBLE,"
-                + " high DOUBLE,"
-                + " low DOUBLE,"
-                + " close DOUBLE,"
-                + " volume DOUBLE)";
-        return message;
-    }
-
-    /**
      * Последнее обновление в указанной таблице
      *
-     * @param bCoin базовая монета
-     * @param qCoin монета котировки
+     * @param nameTable
      * @return
      */
-    public String msgLastUpdatePair(BCoin bCoin, QCoin qCoin) {
-        return "SELECT * FROM " + bCoin + "_" + qCoin + " ORDER BY time DESC LIMIT 1";
+    public String msgLastUpdatePair(NameTable nameTable) {
+        return "SELECT * FROM " + nameTable + " ORDER BY time DESC LIMIT 1";
     }
 
     /**
@@ -151,8 +84,14 @@ public class SqlMsg {
      * @return INSERT INTO bCoin_qCoin ( time, open, high, low, close, volume)
      *         VALUES ('123', '321', '234', '123', '345', '654')
      */
-    public String msgInsertDataBcoin(BCoin bCoin, QCoin qCoin, String time, double open, double high, double low, double close, double volume) {
-        String message = "INSERT INTO " + bCoin + "_" + qCoin + " ( time, open, high, low, close, volume)"
+    public String msgInsertDataCoin(BCoin bCoin, QCoin qCoin, String time, double open, double high, double low, double close, double volume) {
+        String message = "INSERT INTO " + bCoin + "_" + qCoin + " ( "
+                + ColumnsTable.TIME.getName() + ", "
+                + ColumnsTable.OPEN.getName() + ", "
+                + ColumnsTable.HIGH.getName() + ", "
+                + ColumnsTable.LOW.getName() + ", "
+                + ColumnsTable.CLOSE.getName() + ", "
+                + ColumnsTable.VOLUME.getName() + ")"
                 + " VALUES ( '"
                 + time + "', '"
                 + open + "', '"
@@ -164,8 +103,15 @@ public class SqlMsg {
 
     }
 
-    public String msgInsertDataBcoin(NameTable nameTable, String time, double open, double high, double low, double close, double volume) {
-        String message = "INSERT INTO " + nameTable + " ( time, open, high, low, close, volume)"
+    @Deprecated
+    public String msgInsertDataCoin(NameTable nameTable, String time, double open, double high, double low, double close, double volume) {
+        String message = "INSERT INTO " + nameTable + " ( "
+                + ColumnsTable.TIME.getName() + ", "
+                + ColumnsTable.OPEN.getName() + ", "
+                + ColumnsTable.HIGH.getName() + ", "
+                + ColumnsTable.LOW.getName() + ", "
+                + ColumnsTable.CLOSE.getName() + ", "
+                + ColumnsTable.VOLUME.getName() + ")"
                 + " VALUES ( '"
                 + time + "', '"
                 + open + "', '"
@@ -185,6 +131,7 @@ public class SqlMsg {
      * @param bCoin     base coin
      * @return INSERT INTO nameTable ( nameCoin ) VALUES ( 'bCoin' )
      */
+    @Deprecated
     public String msgInsertQcoin(NameTable nameTable, BCoin bCoin) {
         return "INSERT INTO " + nameTable + " ( nameCoin ) VALUES ( '" + bCoin + "' )";
     }
@@ -208,6 +155,7 @@ public class SqlMsg {
      * @param qCoin quote coin
      * @return SELECT time, open, high, low, close, volume FROM bCoin_qCoin
      */
+    @Deprecated
     public String msgReadBcoin(BCoin bCoin, QCoin qCoin) {
         return "SELECT time, open, high, low, close, volume FROM " + bCoin + "_" + qCoin;
     }
@@ -218,11 +166,39 @@ public class SqlMsg {
      *
      * @param nameTable  имя таблицы
      * @param lengthData сколько данных с конца надо
-     * @return
+     * @return SELECT time, open, high, low, close, volume FROM nameTable ORDER
+     *         BY id DESC LIMIT lengthData
      */
-    public String msgReadDataBcoin(NameTable nameTable, int lengthData) {
-        
-        return "SELECT open, high, low, close FROM " + nameTable + " ORDER BY id DESC LIMIT " + lengthData;
+    public String msgReadDataCoin(NameTable nameTable, int lengthData) {
+        String message = "SELECT "
+                + ColumnsTable.TIME.getName() + ", "
+                + ColumnsTable.OPEN.getName() + ", "
+                + ColumnsTable.HIGH.getName() + ", "
+                + ColumnsTable.LOW.getName() + ", "
+                + ColumnsTable.CLOSE.getName() + ", "
+                + ColumnsTable.VOLUME.getName() + " FROM "
+                + nameTable + " ORDER BY id DESC LIMIT "
+                + lengthData;
+        return message;
+        //return "SELECT time, open, high, low, close, volume FROM " + nameTable + " ORDER BY id DESC LIMIT " + lengthData;
+    }
+    /**
+     * Считать данные индикатора
+     * @param nameTable имя таблицы
+     * @param lengthData количество данных
+     * @param one_hour тф выбранного индикатора
+     * @param four_hour тф выбранного индикатора
+     * @param one_day тф выбранного индикатора
+     * @return строку
+     */
+    public String msgReadDataIndicator(NameTable nameTable, int lengthData, ColumnsTable one_hour, ColumnsTable four_hour, ColumnsTable one_day){
+        String message = "SELECT "
+                + one_hour + ", "
+                + four_hour + ", "
+                + one_day + " FROM "
+                + nameTable + " ORDER BY id DESC LIMIT "
+                + lengthData;
+        return message;
     }
 
     /**

@@ -1,7 +1,6 @@
 package com.mycompany.api_okex_binance_v2.database;
 
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
-import com.mycompany.api_okex_binance_v2.interfaces.DatabaseClient;
 import com.mycompany.api_okex_binance_v2.enums.*;
 import com.mycompany.api_okex_binance_v2.obj.CalculationCoin;
 
@@ -33,10 +32,10 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     @Override
     public boolean createAllTable(QCoin qCoin) {
         boolean ok = false;
-        Map<Integer, BCoin> list = getAllPair(qCoin);
+        Set<NameTable> list = getAllPair(qCoin);
         if (connect()) {
-            for (int i = 1; i <= list.size(); i++) {
-                ok = insert(msgCreateTable(list.get(i), qCoin));
+            for (NameTable nameTable : list) {
+                ok = insert(msgCreateTable(nameTable));
             }
             close();
         }
@@ -46,11 +45,11 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     @Override
     public boolean deleteAllTable(QCoin qCoin) {
         boolean ok = false;
-        Map<Integer, BCoin> list = getAllPair(qCoin);
+        Set<NameTable> list = getAllPair(qCoin);
         if (connect()) {
             logger.info("{} - yдаляю все таблицы к {}", exchange, qCoin);
-            for (int i = 1; i <= list.size(); i++) {
-                ok = insert(msgDeleteTable(list.get(i), qCoin));
+            for (NameTable nameTable : list) {
+                ok = insert(msgDeleteTable(nameTable));
             }
             close();
         }
@@ -58,14 +57,14 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     }
 
     @Override
-    public int getLastUpdateTimePair(BCoin bCoin, QCoin qCoin) {
+    public int getLastUpdateTimePair(NameTable nameTable) {
         String lastUpdateIso = "";
         if (connect()) {
-            lastUpdateIso = readLastUpdatePair(msgLastUpdatePair(bCoin, qCoin));
+            lastUpdateIso = readLastUpdatePair(nameTable);
             close();
         }
         if (lastUpdateIso.equals("")) {
-            logger.error("{} - таблица {}_{} пустая", exchange, bCoin, qCoin.toString());
+            logger.error("{} - таблица {} пустая", exchange, nameTable);
             return -2;
         }
         double lastUpdateUnix = Time.isoToUnix(lastUpdateIso);
@@ -73,10 +72,10 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         double offset = utcNowUnix - lastUpdateUnix;
         double to_hour = offset / Tf.HOUR_ONE.quantityMsec();
         if (to_hour > 1) {
-            logger.info("{} - для обновления пары {}_{} нужно {} свечей", exchange, bCoin, qCoin, String.valueOf((int) to_hour));
+            logger.info("{} - для обновления пары {} нужно {} свечей", exchange, nameTable, String.valueOf((int) to_hour));
             return (int) to_hour - 1;
         } else if (to_hour > 200) {
-            logger.info("{} - {}_{} промежуток более 200 свечей, будет обновлено 200 свечей", exchange, bCoin, qCoin);
+            logger.info("{} - {} промежуток более 200 свечей, будет обновлено 200 свечей", exchange, nameTable);
             return 200;
         } else {
             //logger.info("{} - данные для пары {} актуальны, обновления не требуется", exchange, bCoin + "_" + qCoin.toString());
@@ -91,11 +90,10 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         Set<NameTable> listAllTable = null;
         //Лист всех пар из таблиц BTC ETH USDT
         Set<NameTable> listAllPair = new HashSet<>();
-        QCoin[] allQcoin = QCoin.getListQCoin();
         //Получаем все таблицы
         if (connect()) {
             logger.info("{} - сканирую все таблицы в БД...", exchange);
-            listAllTable = readAllTableName(msgSeeAllTable());
+            listAllTable = readAllTableName();
             close();
             if (listAllTable == null) {
                 logger.error("{} - лист со всеми таблицами = null", exchange);
@@ -104,13 +102,10 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         }
         //Получаем все пары таблиц BTC, ETH, USDT
         int counter = 1;
-        for (QCoin qCoin : allQcoin) {
-            Map<Integer, BCoin> list = getAllPair(qCoin);
-            for (int i = 1; i <= list.size(); i++) {
-                listAllPair.add(new NameTable(list.get(i), qCoin));
-            }
+        for (QCoin qCoin : QCoin.values()) {
+             listAllPair.addAll(getAllPair(qCoin)); 
         }
-        logger.info("{} - обьединяю все монеты из таблиц {} в один лист...", exchange, Arrays.toString(allQcoin));
+        logger.info("{} - обьединяю все монеты из таблиц {} в один лист...", exchange, Arrays.toString(QCoin.values()));
         //Ищем делистинг
         logger.info("{} - ищу делистинги...", exchange);
         HashSet<NameTable> delisting = new HashSet<>();
@@ -168,13 +163,13 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     }
 
     @Override
-    public Map<Integer, BCoin> getAllPair(QCoin qCoin) {
+    public Set<NameTable> getAllPair(QCoin qCoin) {
         logger.info("{} - чтение таблицы {}", exchange, qCoin);
         if (connect()) {
             try {
-                Map<Integer, BCoin> map = readAllPair(msgReadQcoin(qCoin));
+                Set<NameTable> set = readAllPair(msgReadQcoin(qCoin), qCoin);
                 close();
-                return map;
+                return set;
             } catch (NullPointerException ex) {
                 logger.error("{} - HashMap пустой. {}", exchange, ex.getMessage());
                 close();
@@ -192,8 +187,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
             for (NameTable table : tables) {
                 try {
                     logger.info("{} - чтение таблицы {}", exchange, table);
-                    String message = msgReadDataBcoin(table, candlesBack);
-                    List<DataCoin> data = readDataPair(candlesBack, message);
+                    List<DataCoin> data = readDataPair(table, candlesBack);
                     map.put(table, data);
                 } catch (NullPointerException e) {
                     logger.error("{} - HashMap пустой. {}", exchange, e.getMessage());
@@ -205,34 +199,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         close();
         return map;
     }
-
-    @Override
-    public boolean insertAllExInfo(HashMap<QCoin, HashSet<BCoin>> list) {
-        boolean ok = connect();
-        if (ok) {
-            for (Map.Entry<QCoin, HashSet<BCoin>> entry : list.entrySet()) {
-                logger.info("Базовый актив - {} , Массив данных - {}", entry.getKey(), entry.getValue().toString());
-                QCoin key = entry.getKey();
-                insert(msgDeleteTable(entry.getKey()));
-                insert(msgCreateTable(entry.getKey()));
-                for (BCoin bCoin : entry.getValue()) {
-                    ok = insert(msgInsertQcoin(entry.getKey(), bCoin));
-                    if (!ok) {
-                        break;
-                    }
-                }
-                if (!ok) {
-                    break;
-                }
-            }
-            close();
-            return ok;
-        } else {
-            logger.info("{} - неудачное подключение к бд или HashSet пустой", exchange);
-            return ok;
-        }
-    }
-
+    
     @Override
     public boolean insertDataPair(Map<NameTable, List<DataCoin>> pairs) {
         try {
@@ -241,7 +208,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
                 logger.info("{} - запись пар в БД... ", exchange);
                 for (Map.Entry<NameTable, List<DataCoin>> entry : pairs.entrySet()) {
                     for (DataCoin c : entry.getValue()) {
-                        ok = insert(msgInsertDataBcoin(entry.getKey(),
+                        ok = insert(msgInsertDataCoin(entry.getKey(),
                                 c.getTime(),
                                 c.getOpen(),
                                 c.getHigh(),
@@ -269,5 +236,32 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
             return false;
         }
     }
+    @Override
+    public boolean insertAllExInfo(HashMap<QCoin, HashSet<BCoin>> list) {
+        boolean ok = connect();
+        if (ok) {
+            for (Map.Entry<QCoin, HashSet<BCoin>> entry : list.entrySet()) {
+                logger.info("Базовый актив - {} , Массив данных - {}", entry.getKey(), entry.getValue().toString());
+                QCoin key = entry.getKey();
+                insert(msgDeleteTable(entry.getKey()));
+                insert(msgCreateTable(entry.getKey()));
+                for (BCoin bCoin : entry.getValue()) {
+                    ok = insert(msgInsertQcoin(entry.getKey(), bCoin));
+                    if (!ok) {
+                        break;
+                    }
+                }
+                if (!ok) {
+                    break;
+                }
+            }
+            close();
+            return ok;
+        } else {
+            logger.info("{} - неудачное подключение к бд или HashSet пустой", exchange);
+            return ok;
+        }
+    }
 
+   
 }

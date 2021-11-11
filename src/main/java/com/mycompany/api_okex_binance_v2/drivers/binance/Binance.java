@@ -24,13 +24,12 @@ public class Binance implements Driver{
         
         logger.info("EX_BINANCE - Перетаскиваю даные из binance.bin в HashMap");
         HashMap<QCoin, HashSet<BCoin>> list = new HashMap<>();
-        QCoin[] qCoins =QCoin.getListQCoin();
         try {
             FileReader fileReader = new FileReader(fail);
             JsonElement jsonElement = JsonParser.parseReader(fileReader);
             JsonObject jsonObject = jsonElement.getAsJsonObject();
             JsonArray jsonArray = jsonObject.get("symbols").getAsJsonArray();
-            for (QCoin qCoin : qCoins){
+            for (QCoin qCoin : QCoin.values()){
                 HashSet<BCoin> set = new HashSet<>();
                 for (JsonElement je : jsonArray) {
                     JsonObject symbolJsonObj = je.getAsJsonObject();
