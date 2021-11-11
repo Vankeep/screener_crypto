@@ -1,5 +1,6 @@
 package com.mycompany.api_okex_binance_v2.database;
 
+import com.mycompany.api_okex_binance_v2.enums.ColumnsTable;
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.enums.QCoin;
 import com.mycompany.api_okex_binance_v2.obj.NameTable;
@@ -74,6 +75,7 @@ public class SqlMsg {
                 + " nameCoin VARCHAR(10))";
         return message;
     }
+
     /**
      * Создание таблицы для монеты на случай листинга.
      * <p>
@@ -89,12 +91,13 @@ public class SqlMsg {
      */
     public String msgCreateTable(BCoin bCoin, QCoin qCoin) {
         String message = "CREATE TABLE " + bCoin + "_" + qCoin + " ("
-                + " time VARCHAR(30),"
-                + " open VARCHAR(30),"
-                + " high VARCHAR(30),"
-                + " low VARCHAR(30),"
-                + " close VARCHAR(30),"
-                + " volume VARCHAR(30))";
+                + " id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + " time DOUBLE,"
+                + " open DOUBLE,"
+                + " high DOUBLE,"
+                + " low DOUBLE,"
+                + " close DOUBLE,"
+                + " volume DOUBLE)";
         return message;
     }
 
@@ -113,12 +116,13 @@ public class SqlMsg {
     public String msgCreateTable(NameTable nameTable) {
 
         String message = "CREATE TABLE " + nameTable + " ("
-                + " time VARCHAR(30),"
-                + " open VARCHAR(30),"
-                + " high VARCHAR(30),"
-                + " low VARCHAR(30),"
-                + " close VARCHAR(30),"
-                + " volume VARCHAR(30))";
+                + " id INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + " time DOUBLE,"
+                + " open DOUBLE,"
+                + " high DOUBLE,"
+                + " low DOUBLE,"
+                + " close DOUBLE,"
+                + " volume DOUBLE)";
         return message;
     }
 
@@ -147,7 +151,7 @@ public class SqlMsg {
      * @return INSERT INTO bCoin_qCoin ( time, open, high, low, close, volume)
      *         VALUES ('123', '321', '234', '123', '345', '654')
      */
-    public String msgInsertBcoin(BCoin bCoin, QCoin qCoin, String time, String open, String high, String low, String close, String volume) {
+    public String msgInsertDataBcoin(BCoin bCoin, QCoin qCoin, String time, double open, double high, double low, double close, double volume) {
         String message = "INSERT INTO " + bCoin + "_" + qCoin + " ( time, open, high, low, close, volume)"
                 + " VALUES ( '"
                 + time + "', '"
@@ -160,7 +164,7 @@ public class SqlMsg {
 
     }
 
-    public String msgInsertBcoin(NameTable nameTable, String time, String open, String high, String low, String close, String volume) {
+    public String msgInsertDataBcoin(NameTable nameTable, String time, double open, double high, double low, double close, double volume) {
         String message = "INSERT INTO " + nameTable + " ( time, open, high, low, close, volume)"
                 + " VALUES ( '"
                 + time + "', '"
@@ -206,6 +210,19 @@ public class SqlMsg {
      */
     public String msgReadBcoin(BCoin bCoin, QCoin qCoin) {
         return "SELECT time, open, high, low, close, volume FROM " + bCoin + "_" + qCoin;
+    }
+
+    /**
+     * Получить ограниченнное количество данных от последнего записанного
+     * значения до lengthData.
+     *
+     * @param nameTable  имя таблицы
+     * @param lengthData сколько данных с конца надо
+     * @return
+     */
+    public String msgReadDataBcoin(NameTable nameTable, int lengthData) {
+        
+        return "SELECT open, high, low, close FROM " + nameTable + " ORDER BY id DESC LIMIT " + lengthData;
     }
 
     /**

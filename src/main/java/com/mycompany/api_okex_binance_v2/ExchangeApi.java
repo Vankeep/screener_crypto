@@ -1,10 +1,7 @@
 package com.mycompany.api_okex_binance_v2;
 
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
-import com.mycompany.api_okex_binance_v2.database.Database;
-import com.mycompany.api_okex_binance_v2.database.Update;
 import com.mycompany.api_okex_binance_v2.enums.*;
-import com.mycompany.api_okex_binance_v2.interfaces.DatabaseClient;
 import com.mycompany.api_okex_binance_v2.net.Connect;
 import com.mycompany.api_okex_binance_v2.obj.*;
 import com.mycompany.api_okex_binance_v2.time.Time;
@@ -30,9 +27,9 @@ public class ExchangeApi extends Connect {
             public void run() {
                 long sd = System.currentTimeMillis();
                 for (QCoin qCoin : QCoin.getListQCoin()) {
-                    Set<UpdateCoin> set = getLastUpdateTime(qCoin);
-                    Set<Set<DataCoin>> ss = downloadDatePair(set, Tf.HOUR_ONE);
-                    insertDataPair(ss);
+                    Set<UpdateCoin> set = getLastUpdateTimeDatabase(qCoin);
+                    Map<NameTable, List<DataCoin>> ss = downloadDatePairFromNet(set, Tf.HOUR_ONE);
+                    insertDataPairFromDatabase(ss);
                     
                 }
                 System.out.println(System.currentTimeMillis()-sd);
@@ -45,7 +42,7 @@ public class ExchangeApi extends Connect {
     public boolean updateAllExInfo() {
         HashMap<QCoin,HashSet<BCoin>> allPair = getAllExInfo();
         if (allPair != null) {
-            if (exDatabaseClient.insertAllExInfo(allPair)) {
+            if (database.insertAllExInfo(allPair)) {
                 logger.info("{} - данные всех пар в БД успешно обновлены", exchange);
                 return true;
             } else {
@@ -60,7 +57,7 @@ public class ExchangeApi extends Connect {
     }
 
     public boolean cleaningDatabase() {
-        return exDatabaseClient.cleaningDatabase();
+        return database.cleaningDatabase();
     }
     /**
      * Для того чтобы набрать много данных 
@@ -68,52 +65,56 @@ public class ExchangeApi extends Connect {
      * @param candlesBack
      * @return 
      */
-    public Set<UpdateCoin> getLastUpdateTime(QCoin qCoin, int candlesBack) {
+    public Set<UpdateCoin> getLastUpdateTimeDatabase(QCoin qCoin, int candlesBack) {
         Set<UpdateCoin> set = new HashSet<>();
-        Map<Integer, BCoin> mapBCoin = exDatabaseClient.getAllPair(qCoin);
+        Map<Integer, BCoin> mapBCoin = database.getAllPair(qCoin);
         for (Map.Entry<Integer, BCoin> entry : mapBCoin.entrySet()) {
             set.add(new UpdateCoin(candlesBack, new NameTable(entry.getValue(), qCoin)));
         }
         return set;
     }
 
-    public Set<UpdateCoin> getLastUpdateTime(QCoin qCoin) {
+    public Set<UpdateCoin> getLastUpdateTimeDatabase(QCoin qCoin) {
         
         Set<UpdateCoin> set = new HashSet<>();
-        Map<Integer, BCoin> mapBCoin = exDatabaseClient.getAllPair(qCoin);
+        Map<Integer, BCoin> mapBCoin = database.getAllPair(qCoin);
         for (Map.Entry<Integer, BCoin> entry : mapBCoin.entrySet()) {
-            int candlesBack = exDatabaseClient.getLastUpdateTimePair(entry.getValue(), qCoin);
+            int candlesBack = database.getLastUpdateTimePair(entry.getValue(), qCoin);
             set.add(new UpdateCoin(candlesBack, new NameTable(entry.getValue(), qCoin)));
         }
         return set;
     }
 
-    public Map<Integer, BCoin> getAllPair(QCoin qCoin) {
-        return exDatabaseClient.getAllPair(qCoin);
+    public Map<Integer, BCoin> getAllPairFromDatabase(QCoin qCoin) {
+        return database.getAllPair(qCoin);
+    }
+    
+    public Map<NameTable, List<DataCoin>> getDataPairFromDatabase(NameTable[] nameTables, int candlesBack){
+        return database.getDataPair(nameTables, candlesBack);
     }
 
     /**
      *
-     * @param set сет из этой getLastUpdateTime функции
+     * @param lastUpdateTimeDatabase
      * @param tf  таймфрейм
      * @return
      */
 
-    public Set<Set<DataCoin>> downloadDatePair(Set<UpdateCoin> set, Tf tf) {
-        Set<Set<DataCoin>> setPairs = new HashSet<>();
-        if (set == null) {
+    public Map<NameTable, List<DataCoin>> downloadDatePairFromNet(Set<UpdateCoin> lastUpdateTimeDatabase, Tf tf) {
+        Map<NameTable, List<DataCoin>> setPairs = new HashMap();
+        if (lastUpdateTimeDatabase == null) {
             return null;
         }
         int counter = 0;
         int cycle = 20;
-        ArrayList<Long> list = new ArrayList<>();
+        List<Long> list = new ArrayList<>();
         list.add(System.currentTimeMillis());
         //Цикл загрузки пар
-        for (UpdateCoin coin : set) {
+        for (UpdateCoin coin : lastUpdateTimeDatabase) {
             if (coin.getCandlesBack() >= 0) {
                 logger.info("{} - загружаю {}...",exchange, coin.getNameTable());
-                Set<DataCoin> pair = getDataPair(coin.getNameTable().getbCoin(), coin.getNameTable().getqCoin(), tf, coin.getCandlesBack());
-                setPairs.add(pair);
+                List<DataCoin> pair = getDataPair(coin.getNameTable().getbCoin(), coin.getNameTable().getqCoin(), tf, coin.getCandlesBack());
+                setPairs.put(coin.getNameTable(), pair);
             }
             if(coin.getCandlesBack()==-1){
                 logger.info("{} - {} данные актуальны", exchange,coin.getNameTable() );
@@ -121,8 +122,8 @@ public class ExchangeApi extends Connect {
             }
             if(coin.getCandlesBack()==-2){
                 logger.info("{} - Таблица {} пустая, загружаю последние данные", exchange,coin.getNameTable());
-                Set<DataCoin> pair = getDataPair(coin.getNameTable().getbCoin(), coin.getNameTable().getqCoin(), tf,0);
-                setPairs.add(pair);
+                List<DataCoin> pair = getDataPair(coin.getNameTable().getbCoin(), coin.getNameTable().getqCoin(), tf,0);
+                setPairs.put(coin.getNameTable(), pair);
                 
             }
             if (counter == cycle) {
@@ -140,13 +141,11 @@ public class ExchangeApi extends Connect {
             counter++;
         }
         list.clear();
-
-        logger.info("{} - Длинна пришедшего сета {} Длинна полученного сета {} ",exchange, set.size(), setPairs.size());
         return setPairs;
     }
 
-    public boolean insertDataPair(Set<Set<DataCoin>> pairs) {
-        boolean ok = exDatabaseClient.insertDataPair(pairs);
+    public boolean insertDataPairFromDatabase(Map<NameTable,List<DataCoin>> downloadingDataPairFromNet) {
+        boolean ok = database.insertDataPair(downloadingDataPairFromNet);
         if (ok) {
             logger.info("{} - Данные успешно записаны в БД", exchange);
             return true;

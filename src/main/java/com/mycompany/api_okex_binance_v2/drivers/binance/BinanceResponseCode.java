@@ -4,9 +4,9 @@ import com.mycompany.api_okex_binance_v2.constants.Const;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DriverResponseCodeBinance {
+public class BinanceResponseCode {
 
-    private static final Logger logger = LoggerFactory.getLogger(DriverResponseCodeBinance.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(BinanceResponseCode.class.getSimpleName());
 
     public static boolean checkResponseCode(int code) {
         switch (code) {

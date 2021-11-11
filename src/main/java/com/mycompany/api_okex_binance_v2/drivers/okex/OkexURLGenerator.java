@@ -9,9 +9,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import org.slf4j.LoggerFactory;
 
-public class DriverURLGeneratorOkex {
+public class OkexURLGenerator {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DriverURLGeneratorOkex.class.getSimpleName());
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(OkexURLGenerator.class.getSimpleName());
 
     public static HttpURLConnection urlAllExchangeInfo() {
         URL url;

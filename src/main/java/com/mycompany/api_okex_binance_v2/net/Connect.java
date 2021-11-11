@@ -16,7 +16,7 @@ import java.net.HttpURLConnection;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,20 +26,20 @@ public class Connect {
     
     public Driver driver;
     public Exchange exchange;
-    public DatabaseClient exDatabaseClient;
+    public DatabaseClient database;
 
     public Connect(Exchange exchange) {
         if (exchange == Exchange.EX_BINANCE){
             logger.info("Создаю обьккт DriverBinance");
-            this.driver = new DriverBinance();
+            this.driver = new Binance();
             
         } else {
             logger.info("Создаю обьект DriverOkex");
-            this.driver = new DriverOkex();
+            this.driver = new Okex();
         }
         
         //this.exHttpClient = new Connect(exchange);
-        this.exDatabaseClient = new Database(exchange);
+        this.database = new Database(exchange);
         this.exchange = exchange;
     }
 
@@ -55,26 +55,26 @@ public class Connect {
      * @return три массива
      */
     protected HashMap<QCoin, HashSet<BCoin>> getAllExInfo() {
-        logger.info("{} - загружаю все пары в файл bin", exchange.getName());
+        logger.info("{} - загружаю все пары в файл bin", exchange);
         HttpURLConnection url = driver.urlAllExchangeInfo();
-        logger.info("{} - драйвер создан", driver.getExchangeName());
-        logger.info("{} - ссылка на загрузку пар: {}", exchange.getName(), url.getURL().toString());
+        logger.info("{} - драйвер создан", exchange);
+        logger.info("{} - ссылка на загрузку пар: {}", exchange, url.getURL().toString());
 
         try {
             if (!checkResponseCode(url.getResponseCode())) {
                 return null;
             }
         } catch (IOException e) {
-            logger.error("{} - ошибка соединения. {}",exchange.getName(), e.getMessage());
+            logger.error("{} - ошибка соединения. {}",exchange, e.getMessage());
             return null;
         }
 
-        String nameFile = Const.PATH_DATABASE + exchange.getName() + ".bin";
+        String nameFile = Const.PATH_DATABASE + exchange + ".bin";
         File file = ConnectJson.getJsonFile(url, nameFile);
         if (file != null) {
             return driver.fileToArray(file);
         } else {
-            logger.error("{} - getAllExInfo вернул null", exchange.getName());
+            logger.error("{} - getAllExInfo вернул null", exchange);
             return null;
 
         }
@@ -90,8 +90,8 @@ public class Connect {
      * @param candlesBack свечей назад
      * @return true if evrethink is ok
      */
-    protected Set<DataCoin> getDataPair(BCoin bCoin, QCoin qCoin, Tf tf, int candlesBack) {
-        logger.debug("{} - загрузка данных пары {}_{}", exchange.getName(), bCoin, qCoin);
+    protected List<DataCoin> getDataPair(BCoin bCoin, QCoin qCoin, Tf tf, int candlesBack) {
+        logger.debug("{} - загрузка данных пары {}_{}", exchange, bCoin, qCoin);
         HttpURLConnection url = driver.urlPairMarketData(bCoin, qCoin, tf, candlesBack);
 
         try {
@@ -99,7 +99,7 @@ public class Connect {
                 return null;
             }
         } catch (IOException e) {
-            logger.error("{} - ошибка соединения. {}",exchange.getName(), e.getMessage());
+            logger.error("{} - ошибка соединения. {}",exchange, e.getMessage());
             return null;
         }
 

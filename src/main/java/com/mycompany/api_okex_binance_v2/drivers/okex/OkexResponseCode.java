@@ -5,9 +5,9 @@ import com.mycompany.api_okex_binance_v2.enums.Exchange;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DriverResponseCodeOkex {
+public class OkexResponseCode {
 
-    private static final Logger logger = LoggerFactory.getLogger(DriverResponseCodeOkex.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(OkexResponseCode.class.getSimpleName());
 
     public static boolean check(int code) {
         switch (code) {

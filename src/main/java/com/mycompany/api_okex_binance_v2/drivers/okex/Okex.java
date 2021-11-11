@@ -10,17 +10,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 
-public class DriverOkex implements Driver{
+public class Okex implements Driver{
     
-    private static final Logger logger = LoggerFactory.getLogger(DriverOkex.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(Okex.class.getSimpleName());
 
 
   
@@ -60,42 +57,36 @@ public class DriverOkex implements Driver{
     }
     
     @Override
-    public Set<DataCoin> stringToArray(String json, NameTable nameTable){
+    public List<DataCoin> stringToArray(String json, NameTable nameTable){
         logger.info("EX_OKEX - {} делаю из строки массив", nameTable);
-        Set<DataCoin> set = new HashSet<>();
+        List<DataCoin> list = new ArrayList<>();
         String[] split = json.replaceAll("]", "").replace("[", "").replace("\"", "").split(",");
         int counter = split.length;
         for (int i = 0; i < split.length/6; i++) {
             counter = counter-6;
-            set.add(new DataCoin(split[counter], //String.valueOf(Time.isoToUnix(split[counter]))
+            list.add(new DataCoin(split[counter], //String.valueOf(Time.isoToUnix(split[counter]))
                     split[counter+1], 
                     split[counter + 2], 
                     split[counter + 3], 
                     split[counter + 4], 
-                    split[counter + 5],
-                    nameTable));
+                    split[counter + 5]));
         }
-        return set;
+        return list;
     }
 
     @Override
     public HttpURLConnection urlAllExchangeInfo() {
-        return DriverURLGeneratorOkex.urlAllExchangeInfo();
+        return OkexURLGenerator.urlAllExchangeInfo();
     }
 
     @Override
     public HttpURLConnection urlPairMarketData(BCoin bCoin, QCoin qCoin, Tf tF, int candlesBack) {
-        return DriverURLGeneratorOkex.urlPairMarketData(bCoin, qCoin, tF, candlesBack);
+        return OkexURLGenerator.urlPairMarketData(bCoin, qCoin, tF, candlesBack);
     }
 
     @Override
     public boolean checkResponseCode(int code) {
-        return DriverResponseCodeOkex.check(code);
-    }
-
-    @Override
-    public String getExchangeName() {
-        return Exchange.EX_OKEX.getName();
+        return OkexResponseCode.check(code);
     }
 
     /**

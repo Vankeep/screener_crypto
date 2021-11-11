@@ -2,7 +2,9 @@ package com.mycompany.api_okex_binance_v2.interfaces;
 
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.enums.*;
+import com.mycompany.api_okex_binance_v2.obj.CalculationCoin;
 import com.mycompany.api_okex_binance_v2.obj.DataCoin;
+import com.mycompany.api_okex_binance_v2.obj.NameTable;
 import java.util.*;
 
 public interface DatabaseClient {
@@ -60,20 +62,11 @@ public interface DatabaseClient {
     /**
      * Чтение данных из бд
      *
-     * @param tf          нужный таймфрейм
-     * @param candlesBack сколько свечей назад
-     * @param bCoin       base currency
-     * @param qCoin       qoute currency
-     * @param ohlc        open high low close
+     * @param nameTables нужные таблицы
+     * @param candlesBack период в часах от последней записи
      * @return
      */
-    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc);
-
-    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2);
-
-    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3);
-
-    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4);
+    public Map<NameTable, List<DataCoin>> getDataPair(NameTable[] nameTables, int candlesBack);
 
     /**
      * Запись принятых всех пар биржи в БД
@@ -89,6 +82,6 @@ public interface DatabaseClient {
      * @param pairs двумерный сет с данными по парам
      * @return true если все успешно
      */
-    public boolean insertDataPair(Set<Set<DataCoin>> pairs);
+    public boolean insertDataPair(Map<NameTable, List<DataCoin>> pairs);
 
 }

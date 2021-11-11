@@ -2,92 +2,61 @@ package com.mycompany.api_okex_binance_v2.obj;
 
 public class DataCoin {
 
-    String time;
-    String open;
-    String high;
-    String low;
-    String close;
-    String volume;
-    NameTable nameTable;
+    private String time;
+    private double open;
+    private double high;
+    private double low;
+    private double close;
+    private double volume;
 
     public DataCoin(String time, String open, String high, String low, String close, String volume) {
         this.time = time;
-        this.open = open;
-        this.high = high;
-        this.low = low;
-        this.close = close;
-        this.volume = volume;
+        this.open = Double.parseDouble(open);
+        this.high = Double.parseDouble(high);
+        this.low = Double.parseDouble(low);
+        this.close = Double.parseDouble(close);
+        this.volume = Double.parseDouble(volume);
     }
 
-    public DataCoin(String time, String open, String high, String low, String close, String volume, NameTable nameTable) {
-        this.nameTable = nameTable;
-        this.time = time;
+    public DataCoin(double open, double high, double low, double close, double volume) {
         this.open = open;
         this.high = high;
         this.low = low;
         this.close = close;
         this.volume = volume;
     }
+    
+    
 
     public String getTime() {
         return time;
     }
 
-    public String getOpen() {
+    public double getOpen() {
         return open;
     }
 
-    public String getHigh() {
+    public double getHigh() {
         return high;
     }
 
-    public String getLow() {
+    public double getLow() {
         return low;
     }
 
-    public String getClose() {
+    public double getClose() {
         return close;
     }
 
-    public String getVolume() {
+    public double getVolume() {
         return volume;
     }
 
-    public NameTable getNameTable() {
-        return nameTable;
-    }
-
-    public void setNameTable(NameTable nameTable) {
-        this.nameTable = nameTable;
-    }
-
-    public void setTime(String time) {
-        this.time = time;
-    }
-
-    public void setOpen(String open) {
-        this.open = open;
-    }
-
-    public void setHigh(String high) {
-        this.high = high;
-    }
-
-    public void setLow(String low) {
-        this.low = low;
-    }
-
-    public void setClose(String close) {
-        this.close = close;
-    }
-
-    public void setVolume(String volume) {
-        this.volume = volume;
-    }
+    
 
     @Override
     public String toString() {
-        return "{" + "time=" + time + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", volume=" + volume + ", nameTable=" + nameTable + '}';
+        return "{" + "time=" + time + ", open=" + open + ", high=" + high + ", low=" + low + ", close=" + close + ", volume=" + volume + '}';
     }
 
 }

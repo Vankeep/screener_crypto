@@ -11,16 +11,13 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DriverBinance implements Driver{
+public class Binance implements Driver{
 
-    private static final Logger logger = LoggerFactory.getLogger(DriverBinance.class.getSimpleName());
+    private static final Logger logger = LoggerFactory.getLogger(Binance.class.getSimpleName());
     
     @Override
     public HashMap<QCoin,HashSet<BCoin>> fileToArray(File fail) {
@@ -56,9 +53,9 @@ public class DriverBinance implements Driver{
     }
     
     @Override
-    public Set<DataCoin> stringToArray(String json, NameTable nameTable) {
+    public List<DataCoin> stringToArray(String json, NameTable nameTable) {
         logger.info("EX_BINANCE - {} делаю из строки массив", nameTable);
-        Set<DataCoin> set = new HashSet<>();
+        List<DataCoin> set = new ArrayList<>();
         String[] split = json.replaceAll("]", "").replace("[", "").replace("\"", "").split(",");
         int counter = 0;
         for (int i = 0; i < split.length / 12; i++) {
@@ -68,31 +65,25 @@ public class DriverBinance implements Driver{
                     split[counter + 2], 
                     split[counter + 3], 
                     split[counter + 4], 
-                    split[counter + 5],
-                    nameTable));
+                    split[counter + 5]));
             counter = counter + 12;
         }
         return set;
     }
 
     @Override
-    public String getExchangeName() {
-        return Exchange.EX_BINANCE.getName();
-    }
-
-    @Override
     public HttpURLConnection urlAllExchangeInfo() {
-       return DriverURLGeneratorBinance.AllExchangeInfo();
+       return BinanceURLGenerator.AllExchangeInfo();
     }
 
     @Override
     public HttpURLConnection urlPairMarketData(BCoin bCoin, QCoin qCoin, Tf tF, int candlesBack) {
-        return DriverURLGeneratorBinance.PairMarketData(bCoin, qCoin, tF, candlesBack);
+        return BinanceURLGenerator.PairMarketData(bCoin, qCoin, tF, candlesBack);
     }
 
     @Override
     public boolean checkResponseCode(int code) {
-        return DriverResponseCodeBinance.checkResponseCode(code);
+        return BinanceResponseCode.checkResponseCode(code);
     }
 
 }

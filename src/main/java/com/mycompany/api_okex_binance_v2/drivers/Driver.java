@@ -7,10 +7,7 @@ import com.mycompany.api_okex_binance_v2.obj.DataCoin;
 import com.mycompany.api_okex_binance_v2.obj.NameTable;
 import java.io.File;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public interface Driver {
 
@@ -29,7 +26,7 @@ public interface Driver {
      * @param nameTable имя таблицы 
      * @return массив обьктов CoinCoin
      */
-    public Set<DataCoin> stringToArray(String json, NameTable nameTable);
+    public List<DataCoin> stringToArray(String json, NameTable nameTable);
 
     /**
      * Сыылка на все монеты актуальной биржи
@@ -58,10 +55,5 @@ public interface Driver {
      */
     public boolean checkResponseCode(int code);
     
-    /**
-     * Получить имя биржи. Должен возвращать строку такого вида "binance", "okex"
-     * @return 
-     */
-    public String getExchangeName();
 
 }

@@ -3,7 +3,10 @@ package com.mycompany.api_okex_binance_v2.database;
 import com.mycompany.api_okex_binance_v2.constants.Const;
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.enums.Exchange;
+import com.mycompany.api_okex_binance_v2.enums.ColumnsTable;
 import com.mycompany.api_okex_binance_v2.enums.QCoin;
+import com.mycompany.api_okex_binance_v2.obj.CalculationCoin;
+import com.mycompany.api_okex_binance_v2.obj.DataCoin;
 import com.mycompany.api_okex_binance_v2.obj.NameTable;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -90,7 +93,7 @@ public class DBInsertAndRead extends SqlMsg {
                         }
                     }
                 } catch (ArrayIndexOutOfBoundsException ex) {
-                    
+
                 }
             }
             return list;
@@ -113,6 +116,27 @@ public class DBInsertAndRead extends SqlMsg {
                 map.put(key, nameCoin);
             }
             return map;
+        } catch (SQLException ex) {
+            logger.error("{} - {}. Сообщение - {}", exchange, ex.getMessage(), message);
+            return null;
+        }
+    }
+
+    public List<DataCoin> readDataPair(int lengthData, String message) {
+        List<DataCoin> data = new ArrayList<>(lengthData);
+        try {
+            statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery(message);
+            int counter = 0;
+            while (rs.next()) {
+                double open = rs.getDouble("open");
+                double high = rs.getDouble("high");
+                double low = rs.getDouble("low");
+                double close = rs.getDouble("close");
+                data.add(new DataCoin(open, high, low, close, close));
+            }
+            return data;
+
         } catch (SQLException ex) {
             logger.error("{} - {}. Сообщение - {}", exchange, ex.getMessage(), message);
             return null;

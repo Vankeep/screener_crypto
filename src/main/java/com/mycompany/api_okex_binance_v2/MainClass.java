@@ -2,11 +2,9 @@ package com.mycompany.api_okex_binance_v2;
 
 
 import com.mycompany.api_okex_binance_v2.database.Database;
-import com.mycompany.api_okex_binance_v2.database.Update;
 import com.mycompany.api_okex_binance_v2.enums.*;
-import com.mycompany.api_okex_binance_v2.time.Time;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import com.mycompany.api_okex_binance_v2.obj.*;
+import java.util.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,18 +14,37 @@ public class MainClass {
 
     public static void main(String[] args) {
         ExchangeApi okex = new ExchangeApi(Exchange.EX_OKEX);
-        okex.run();
+        Database ok = new Database(Exchange.EX_OKEX);
+        
+        //okex.insertDataPairFromDatabase(okex.downloadDatePairFromNet(okex.getLastUpdateTimeDatabase(QCoin.ETH, 20), Tf.HOUR_ONE));
+        NameTable[] nameTable = new NameTable[]{new NameTable(new BCoin("XLM"), QCoin.ETH), new NameTable(new BCoin("SOL"), QCoin.ETH)};
+        Map<NameTable, List<DataCoin>> data = okex.getDataPairFromDatabase(nameTable, 14);
+        int co = 1;
+        for (Map.Entry<NameTable, List<DataCoin>> entry : data.entrySet()) {
+            for (DataCoin coinData : entry.getValue()) {
+                logger.info("{} {} {} {} {} {} {}", entry.getKey(),
+                        co,
+                        coinData.getOpen(),
+                        coinData.getHigh(),
+                        coinData.getLow(),
+                        coinData.getClose(),
+                        coinData.getVolume());
+                co++;
+            }
+ 
+           
+        }
         
     }
 
-    public static void test() {
-        ExchangeApi okex = new ExchangeApi(Exchange.EX_OKEX);
-        for (QCoin qCoin : QCoin.getListQCoin()) {
-            Update.startUpdate(qCoin, okex);
-        }
-    
-
-    }
+//    public static void test() {
+//        ExchangeApi okex = new ExchangeApi(Exchange.EX_OKEX);
+//        for (QCoin qCoin : QCoin.getListQCoin()) {
+//            Update.startUpdate(qCoin, okex);
+//        }
+//    
+//
+//    }
     public static void test2(){
         ExchangeApi okApi = new ExchangeApi(Exchange.EX_OKEX);
         okApi.cleaningDatabase();

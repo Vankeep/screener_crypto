@@ -8,9 +8,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import org.slf4j.LoggerFactory;
 
-public class DriverURLGeneratorBinance {
+public class BinanceURLGenerator {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(DriverURLGeneratorBinance.class.getSimpleName());
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(BinanceURLGenerator.class.getSimpleName());
     
     public static HttpURLConnection AllExchangeInfo() {
         URL url;

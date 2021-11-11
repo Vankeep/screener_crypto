@@ -3,6 +3,7 @@ package com.mycompany.api_okex_binance_v2.database;
 import com.mycompany.api_okex_binance_v2.obj.BCoin;
 import com.mycompany.api_okex_binance_v2.interfaces.DatabaseClient;
 import com.mycompany.api_okex_binance_v2.enums.*;
+import com.mycompany.api_okex_binance_v2.obj.CalculationCoin;
 
 import com.mycompany.api_okex_binance_v2.obj.DataCoin;
 import com.mycompany.api_okex_binance_v2.obj.NameTable;
@@ -47,7 +48,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         boolean ok = false;
         Map<Integer, BCoin> list = getAllPair(qCoin);
         if (connect()) {
-            logger.info("{} - yдаляю пары к {}", exchange, qCoin);
+            logger.info("{} - yдаляю все таблицы к {}", exchange, qCoin);
             for (int i = 1; i <= list.size(); i++) {
                 ok = insert(msgDeleteTable(list.get(i), qCoin));
             }
@@ -109,9 +110,9 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
                 listAllPair.add(new NameTable(list.get(i), qCoin));
             }
         }
-        logger.info("{} - обьединяю все монеты из таблиц {} в один лист...",exchange, Arrays.toString(allQcoin));
+        logger.info("{} - обьединяю все монеты из таблиц {} в один лист...", exchange, Arrays.toString(allQcoin));
         //Ищем делистинг
-        logger.info("{} - ищу делистинги...",exchange);
+        logger.info("{} - ищу делистинги...", exchange);
         HashSet<NameTable> delisting = new HashSet<>();
         boolean findDelist = false;
         for (NameTable table : listAllTable) {
@@ -143,21 +144,21 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
                 listing.add(pair);
             }
         }
-        
+
         //Удаляем делистинг
         logger.info("{} - удаляю таблицы - {}...", exchange, delisting);
         for (NameTable table : delisting) {
-            if (sendMessage(msgDeleteTable(table))){
+            if (sendMessage(msgDeleteTable(table))) {
                 logger.info("Удалена неактуальная таблица {}", table);
             }
         }
-        
+
         //Создаем все недостающие таблицы
         logger.info("{} - создаю таблицы - {}...", exchange, listing);
         for (NameTable table : listing) {
-           if (sendMessage(msgCreateTable(table))){
-               logger.info("Создана новая таблица {}", table);
-           }
+            if (sendMessage(msgCreateTable(table))) {
+                logger.info("Создана новая таблица {}", table);
+            }
         }
         delisting.clear();
         listing.clear();
@@ -171,7 +172,6 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
         logger.info("{} - чтение таблицы {}", exchange, qCoin);
         if (connect()) {
             try {
-                
                 Map<Integer, BCoin> map = readAllPair(msgReadQcoin(qCoin));
                 close();
                 return map;
@@ -185,27 +185,29 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     }
 
     @Override
-    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    public Map<NameTable, List<DataCoin>> getDataPair(NameTable[] tables, int candlesBack) {
+        int counter = 0;
+        Map<NameTable, List<DataCoin>> map = new HashMap<>();
+        if (connect()) {
+            for (NameTable table : tables) {
+                try {
+                    logger.info("{} - чтение таблицы {}", exchange, table);
+                    String message = msgReadDataBcoin(table, candlesBack);
+                    List<DataCoin> data = readDataPair(candlesBack, message);
+                    map.put(table, data);
+                } catch (NullPointerException e) {
+                    logger.error("{} - HashMap пустой. {}", exchange, e.getMessage());
+                    close();
+                    return null;
+                }
+            }
+        }
+        close();
+        return map;
     }
 
     @Override
-    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public ArrayList<DataCoin> getDataCoin(Tf tf, int candlesBack, BCoin bCoin, QCoin qCoin, Ohlc ohlc1, Ohlc ohlc2, Ohlc ohlc3, Ohlc ohlc4) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public boolean insertAllExInfo(HashMap<QCoin,HashSet<BCoin>> list) {
+    public boolean insertAllExInfo(HashMap<QCoin, HashSet<BCoin>> list) {
         boolean ok = connect();
         if (ok) {
             for (Map.Entry<QCoin, HashSet<BCoin>> entry : list.entrySet()) {
@@ -213,8 +215,8 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
                 QCoin key = entry.getKey();
                 insert(msgDeleteTable(entry.getKey()));
                 insert(msgCreateTable(entry.getKey()));
-                for (BCoin bCoin: entry.getValue()){
-                    ok = insert(msgInsertQcoin(entry.getKey(),bCoin));
+                for (BCoin bCoin : entry.getValue()) {
+                    ok = insert(msgInsertQcoin(entry.getKey(), bCoin));
                     if (!ok) {
                         break;
                     }
@@ -232,14 +234,14 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
     }
 
     @Override
-    public boolean insertDataPair(Set<Set<DataCoin>> pairs) {
+    public boolean insertDataPair(Map<NameTable, List<DataCoin>> pairs) {
         try {
             boolean ok = connect();
             if (ok) {
                 logger.info("{} - запись пар в БД... ", exchange);
-                for (Set<DataCoin> pair : pairs) {
-                    for (DataCoin c : pair) {
-                        ok = insert(msgInsertBcoin(c.getNameTable(),
+                for (Map.Entry<NameTable, List<DataCoin>> entry : pairs.entrySet()) {
+                    for (DataCoin c : entry.getValue()) {
+                        ok = insert(msgInsertDataBcoin(entry.getKey(),
                                 c.getTime(),
                                 c.getOpen(),
                                 c.getHigh(),
@@ -247,7 +249,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
                                 c.getClose(),
                                 c.getVolume()));
                         if (!ok) {
-                            logger.info("Ошибка записи {}", c.getNameTable());
+                            logger.info("Ошибка записи {}", entry.getKey());
                             break;
                         }
                     }
@@ -263,7 +265,7 @@ public class Database extends DBInsertAndRead implements DatabaseClient {
             }
 
         } catch (NullPointerException ex) {
-            logger.error("Set<Set<CoinCoin>> = null. Сет для записи данных в БД пустой");
+            logger.error("Map<NameTable, List<DataCoin>> = null. Сет для записи данных в БД пустой");
             return false;
         }
     }
